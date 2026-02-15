@@ -1,33 +1,20 @@
 @echo off
 echo.
-echo === Getting Latest Changes ===
+echo === Syncing Project ===
 echo.
 
-REM Pull from GitHub
 git pull
 
-echo.
-echo === Activating Virtual Environment ===
-echo.
-
-REM Activate virtual environment
 call venv\Scripts\activate
 
-echo.
-echo === Checking for New Packages ===
-echo.
-
-REM Install any new packages from requirements.txt
-pip install -r requirements.txt --quiet
+REM Only install if requirements.txt changed
+git diff HEAD@{1} HEAD --name-only | findstr /C:"requirements.txt" >nul
+if %errorlevel% equ 0 (
+    pip install -r requirements.txt
+)
 
 echo.
 echo === Ready! ===
 echo.
-echo Virtual environment is active.
-echo All packages are up to date.
-echo.
-echo You can now run: python app.py
-echo.
 
-REM Keep command prompt open with venv activated
 cmd /k
