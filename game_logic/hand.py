@@ -9,13 +9,25 @@ from game_logic.card import Card, Suit
 
 class Hand:
     def __init__(self):
-        self.cards = []
+        self.cards = [] #Initialises hand as a list of cards
+        self.selected_card = []
     
+    def __repr__(self):
+        for i in self.cards:
+            print(i)
+        return
+        
     def add_card(self, card):
         self.cards.append(card)
     
     def remove_card(self, card):
         self.cards.remove(card)
+    
+    def select_card(self, card):
+        self.selected_card.append(card)
+    
+    def deselect_card(self, card):
+        self.selected_card.remove(card)
     
     def sort_rank(self, items):
         if len(items) <= 1:
@@ -32,3 +44,20 @@ class Hand:
             else:
                 items_lower.append(i)
         return self.sort_rank(items_lower) + [pivot_card] + self.sort_rank(items_greater)
+    
+    def sort_suit(self, items):
+        items_hearts = []
+        items_clubs = []
+        items_diamonds = []
+        items_spades = []
+        for i in items:
+            if i.suit.value == 1:
+                items_hearts.append(i)
+            if i.suit.value == 2:
+                items_clubs.append(i)
+            if i.suit.value == 3:
+                items_diamonds.append(i)
+            if i.suit.value == 4:
+                items_spades.append(i)
+        
+        return self.sort_rank(items_hearts) + self.sort_rank(items_clubs)  + self.sort_rank(items_diamonds) + self.sort_rank(items_spades)
