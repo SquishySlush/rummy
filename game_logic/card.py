@@ -31,10 +31,10 @@ class Suit(Enum):
     
     #Creating an immutable enum for Suits
     
-    Hearts = "Hearts"
-    Clubs = "Clubs"
-    Spades = "Spades"
-    Diamods = "Diamonds"
+    Hearts = 1
+    Clubs = 2
+    Diamods = 3
+    Spades = 4
 
 
 class Card:
@@ -49,7 +49,7 @@ class Card:
         self.rank = rank
         self.suit = suit
     
-    def return_rank_index(self): 
+    def return_rank_index(self): #RReturns the rank index, for sorting and meld validation. (Runs)
         return rank_index[self.rank]
     
     def __repr__(self): #Representation function for print(CardObject), such that it will output "Rank of Suit"
