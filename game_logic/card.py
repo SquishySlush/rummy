@@ -7,8 +7,21 @@ Created on Mon Feb 16 08:05:13 2026
 
 from enum import Enum
 
-#Dictionary of ranks and indexes for both sorting and validating runs
-
+rank_index = { #Used for checking if a run is valid
+    "Ace"  : 0,
+    "2" : 1,
+    "3" : 2,
+    "4" : 3,
+    "5" : 4,
+    "6" : 5,
+    "7" : 6,
+    "8" : 7,
+    "9" : 8,
+    "10" : 9,
+    "Jack" : 10,
+    "Queen" : 11,
+    "King" : 12
+    }
 
 
 
@@ -16,40 +29,28 @@ class Suit(Enum):
     
     #Creating an immutable enum for Suits
     
-    Hearts = 1
-    Clubs = 2
-    Diamonds = 3
-    Spades = 4
+    Hearts = 0
+    Clubs = 1
+    Diamonds = 2
+    Spades = 3
 
 
 class Card:
-    def __init__(self, rank, suit):
-        rank_index = {
-            "Ace"  : 0,
-            "2" : 1,
-            "3" : 2,
-            "4" : 3,
-            "5" : 4,
-            "6" : 5,
-            "7" : 6,
-            "8" : 7,
-            "9" : 8,
-            "10" : 9,
-            "Jack" : 10,
-            "Queen" : 11,
-            "King" : 12
-            }
-        #Validating if the inputs are allowed
+    def __init__(self, rank, suit, is_wild):
         
-        if rank not in rank_index:
-            raise ValueError(f"{rank} is not a valid rank")
-        if suit not in Suit:
-            raise ValueError(f"{suit} is not a valid suit")
+        self.is_wild = is_wild #Is the card a wild card, 1 or 0
+        
+        if self.is_wild == 0: #if a card is a wild card, do not check suit or rank validity.
+            if rank not in rank_index:         #Validating if the inputs are allowed
+                raise ValueError(f"{rank} is not a valid rank")
+            if suit not in Suit:
+                raise ValueError(f"{suit} is not a valid suit")
+                
         self.rank = rank
         self.suit = suit
     
     def return_rank_index(self): #RReturns the rank index, for sorting and meld validation. (Runs)
-        return Card.rank_index[self.rank]
+        return int(rank_index[self.rank])
     
     def __repr__(self): #Representation function for print(CardObject), such that it will output "Rank of Suit"
         return f"{self.rank} of {self.suit.name}"

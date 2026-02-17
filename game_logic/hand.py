@@ -5,31 +5,44 @@ Created on Mon Feb 16 09:34:56 2026
 @author: Faisal
 """
 
-from game_logic.card import Card, Suit
-
 class Hand:
     def __init__(self):
         self.cards = [] #Initialises hand as a list of cards
         self.selected_card = []
     
     def __repr__(self):
-        for i in self.cards:
-            print(i)
-        return
+        for card in self.cards:
+            card_strings  = [str(card) for card in self.cards] #Creates a list of str(card) from self.cards
+        if len(self.selected_card) > 0:
+            for card in self.selected_card:
+                selected_card_strings = [str(card) for card in self.selected_card]
+            return (', '.join(card_strings) + "\n Selected Cards:" + ', '.join(selected_card_strings)) #Joins the objects of the list with ', ', such that it appears object, object, ...
+        else:
+            return ', '.join(card_strings)
         
-    def add_card(self, card):
+        
+    def add_card(self, card): #appends card to list
         self.cards.append(card)
     
-    def remove_card(self, card):
+    def remove_card(self, card): #removes card object from the list
         self.cards.remove(card)
     
-    def select_card(self, card):
+    def select_card(self, card): #Adds card object to a seperate list
         self.selected_card.append(card)
     
-    def deselect_card(self, card):
+    def deselect_card(self, card): #removes cccard from selected_card
         self.selected_card.remove(card)
+        
+    def deselect_all(self): #Deselects all cards
+        self.selected_card = []
     
-    def sort_rank(self, items):
+    def sort_by_rank(self):
+        self.cards = self.sort_rank(self.cards)
+    
+    def sort_by_suit(self):
+        self.cards = self.sort_suit(self.cards)
+    
+    def sort_rank(self, items): #Backend of sorting by rank, standard quicksort algorithm
         if len(items) <= 1:
             return items
 
@@ -39,25 +52,25 @@ class Hand:
         items_lower = []
         
         for i in items:
-            if i.return_rank_index > pivot_index:
+            if i.return_rank_index() > pivot_index:
                 items_greater.append(i)
             else:
                 items_lower.append(i)
         return self.sort_rank(items_lower) + [pivot_card] + self.sort_rank(items_greater)
     
-    def sort_suit(self, items):
+    def sort_suit(self, items): #Split cards by suit, before sorting each on its own. It then sorts each individually using sort_rank, before joining them together.
         items_hearts = []
         items_clubs = []
         items_diamonds = []
         items_spades = []
         for i in items:
-            if i.suit.value == 1:
+            if i.suit.value == 0:
                 items_hearts.append(i)
-            if i.suit.value == 2:
+            if i.suit.value == 1:
                 items_clubs.append(i)
-            if i.suit.value == 3:
+            if i.suit.value == 2:
                 items_diamonds.append(i)
-            if i.suit.value == 4:
+            if i.suit.value == 3:
                 items_spades.append(i)
         
         return self.sort_rank(items_hearts) + self.sort_rank(items_clubs)  + self.sort_rank(items_diamonds) + self.sort_rank(items_spades)
