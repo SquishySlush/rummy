@@ -5,3 +5,37 @@ Created on Wed Feb 18 11:33:37 2026
 @author: Faisal
 """
 
+from game_logic.utils import sort_rank
+
+
+class validator:
+
+    def validate_set(cards, ruleset):
+        if len(cards) > ruleset.max_meld_size_set:
+            return False
+        ranks = []
+        for card in cards:
+            ranks.append(card.rank)
+            if len(ranks) != len(set(ranks)):
+                return False
+            else:
+                suits = []
+                for card in cards:
+                    suits.append(card.suit.name)
+                    if len(suits) == len(set(suits)):
+                        return True
+                    else:
+                        return False
+    
+    def validate_run(cards, ruleset):
+        
+        cards = sort_rank(cards)
+        card1_index = cards[0].index
+        for card in cards:
+            if card.rank != cards[0].rank:
+                return False
+            for i in range(len(cards)):
+                if card1_index + i != cards[i].index:
+                    return False      
+        return True
+            
