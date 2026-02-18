@@ -4,36 +4,7 @@ Created on Mon Feb 16 08:05:13 2026
 
 @author: Faisal
 """
-
-from enum import Enum
-
-rank_index = { #Used for checking if a run is valid
-    "Ace"  : 0,
-    "2" : 1,
-    "3" : 2,
-    "4" : 3,
-    "5" : 4,
-    "6" : 5,
-    "7" : 6,
-    "8" : 7,
-    "9" : 8,
-    "10" : 9,
-    "Jack" : 10,
-    "Queen" : 11,
-    "King" : 12
-    }
-
-
-
-class Suit(Enum):
-    
-    #Creating an immutable enum for Suits
-    
-    Hearts = 0
-    Clubs = 1
-    Diamonds = 2
-    Spades = 3
-
+from game_logic.utils import Suit, rank_index
 
 class Card:
     def __init__(self, rank, suit, is_wild):
@@ -61,7 +32,5 @@ class Card:
     def return_value(self): #Returning the value of a card, for melds.
         if self.rank in ["Jack", "Queen", "King"]:
             return 10
-        elif self.rank == "Ace":
-            return 1
         else:
             return int(self.rank)

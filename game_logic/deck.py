@@ -4,7 +4,8 @@ Created on Tue Feb 17 10:02:52 2026
 
 @author: Faisal
 """
-from game_logic.card import Card, rank_index, Suit
+from game_logic.utils import rank_index, Suit
+from game_logic.card import Card
 import random
 
 class Deck:

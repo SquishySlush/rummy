@@ -5,6 +5,8 @@ Created on Mon Feb 16 09:34:56 2026
 @author: Faisal
 """
 
+from game_logic.utils import sort_rank
+
 class Hand:
     def __init__(self):
         self.cards = [] #Initialises hand as a list of cards
@@ -37,26 +39,10 @@ class Hand:
         self.selected_card = []
     
     def sort_by_rank(self):
-        self.cards = self.sort_rank(self.cards)
+        self.cards = sort_rank(self.cards)
     
     def sort_by_suit(self):
         self.cards = self.sort_suit(self.cards)
-    
-    def sort_rank(self, items): #Backend of sorting by rank, standard quicksort algorithm
-        if len(items) <= 1:
-            return items
-
-        pivot_card = items.pop()
-        pivot_index = pivot_card.return_rank_index()
-        items_greater = []
-        items_lower = []
-        
-        for i in items:
-            if i.return_rank_index() > pivot_index:
-                items_greater.append(i)
-            else:
-                items_lower.append(i)
-        return self.sort_rank(items_lower) + [pivot_card] + self.sort_rank(items_greater)
     
     def sort_suit(self, items): #Split cards by suit, before sorting each on its own. It then sorts each individually using sort_rank, before joining them together.
         items_hearts = []

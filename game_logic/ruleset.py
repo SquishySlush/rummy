@@ -5,6 +5,7 @@ Created on Wed Feb 18 08:02:13 2026
 @author: Faisal
 """
 
+
 class Ruleset:
     def __init__(self, config=None):
         config = config or {}
@@ -20,7 +21,10 @@ class Ruleset:
         self.num_wilds = config.get('num_wilds', [0])
         
         self.scoring_method = config.get('scoring_method', 'negative')
-    
+        
+        self.ace_high = config.get('ace_high', False)
+        self.ace_both = config.get('ace_both',  True)
+        
     def is_wild(self, card):
         if card.rank in self.wilds:
             return True
@@ -35,4 +39,9 @@ class Ruleset:
                 'max_meld_size_run' : self.max_meld_size_run,
                 'wilds' : self.wilds,
                 'num_wilds' : self.num_wilds,
-                'scoring_method' : self.scoring_method}
+                'scoring_method' : self.scoring_method,
+                'ace_high' : self.ace_high,
+                'ace_both' : self.ace_both}
+    
+        
+        
