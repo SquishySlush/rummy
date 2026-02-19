@@ -10,15 +10,15 @@ from game_logic.utils import sort_rank
 class Hand:
     def __init__(self):
         self.cards = [] #Initialises hand as a list of cards
-        self.selected_card = []
+        self.selected_cards = []
     
     def __repr__(self):
         for card in self.cards:
             card_strings  = [str(card) for card in self.cards] #Creates a list of str(card) from self.cards
-        if len(self.selected_card) > 0:
-            for card in self.selected_card:
-                selected_card_strings = [str(card) for card in self.selected_card]
-            return (', '.join(card_strings) + "\n Selected Cards:" + ', '.join(selected_card_strings)) #Joins the objects of the list with ', ', such that it appears object, object, ...
+        if len(self.selected_cards) > 0:
+            for card in self.selected_cards:
+                selected_cards_strings = [str(card) for card in self.selected_cards]
+            return (', '.join(card_strings) + "\n Selected Cards:" + ', '.join(selected_cards_strings)) #Joins the objects of the list with ', ', such that it appears object, object, ...
         else:
             return ', '.join(card_strings)
         
@@ -29,14 +29,14 @@ class Hand:
     def remove_card(self, card): #removes card object from the list
         self.cards.remove(card)
     
-    def select_card(self, card): #Adds card object to a seperate list
-        self.selected_card.append(card)
+    def select_card(self, card): #Adds card object to a seperate list called selected_cards
+        self.selected_cards.append(card)
     
-    def deselect_card(self, card): #removes cccard from selected_card
-        self.selected_card.remove(card)
+    def deselect_card(self, card): #removes card from selected_cards list
+        self.selected_cards.remove(card)
         
-    def deselect_all(self): #Deselects all cards
-        self.selected_card = []
+    def deselect_all(self): #Deselects all cards by setting the selected cards to an empty list
+        self.selected_cards = []
     
     def sort_by_rank(self):
         self.cards = sort_rank(self.cards)

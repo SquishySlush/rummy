@@ -4,19 +4,38 @@ Created on Tue Feb 17 10:02:52 2026
 
 @author: Faisal
 """
-from game_logic.utils import rank_index, Suit
+from game_logic.utils import rank_index, Suit, wilds
 from game_logic.card import Card
 import random
 
 class Deck:
-    def __init__(self, num_jokers):
+    
+    #when  the deck initiaises, creates a full deck of cards + jokers depending on the number of jokers chosen.
+    
+    def __init__(self, num_wilds):
+        
+        #num_wilds is a list, where each index corresponds to an index in wilds.
         self.cards = []
-        self.num_jokers =  int(num_jokers)
+        self.num_wilds =  num_wilds
+        
+        
+        #Removes wild cards from rank_index, so that it doesnt generate twice
+        for card in wilds:
+            if card in rank_index:
+                del rank_index[card]
+                
+                
         for  rank in rank_index:
             for suit in Suit:
                 self.cards.append(Card(rank, suit, 0))
-        for i in range(num_jokers):
-            self.cards.append(Card("Joker", "", 1))
+    
+        #Creates wild cards with
+    
+        for i in range(len(wilds)): 
+            for j in range(num_wilds[i]):
+                self.cards.append(Card(wilds[i], ''))
+    
+    #Shuffles the deck, by moving each card to a random position in the deck. This is used in unison with the draw function to have an O(1) when drawing a card, as otherwise it would have to choose a random card everytime, with an O(n) time complexity. 
     
     def shuffle(self):
         result = []
@@ -26,16 +45,21 @@ class Deck:
             self.cards.remove(self.cards[roll])
         self.cards  = result
     
+    
+    #Returns the top card of the deck, while removing it.
     def draw(self):
         return self.cards.pop()
     
+    #Returns the size of the deck
     def size(self):
         return len(self.cards)
     
+    #Checks if the deck is empty
     def empty_check(self):
         if len(self.cards) == 0:
             return
     
+    #Appends a list of cards to the deck, e.g. all cards except top of a discard pile
     def add_cards(self, cards):
         self.cards.append(cards)
     
