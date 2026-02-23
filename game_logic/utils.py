@@ -15,12 +15,6 @@ def sort_rank(items): #Backend of sorting by rank, standard quicksort algorithm
             items_lower.append(i)
     return sort_rank(items_lower) + [pivot_card] + sort_rank(items_greater)
 
-def is_wild(card): #Checks  if a card is a wild card
-    if card.rank in wilds:
-        return True
-    else:
-        return False
-
 rank_index = { #Index of the cards. Used for meld validation and score.
     "Ace"  : 0,
     "2" : 1,

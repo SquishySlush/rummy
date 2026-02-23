@@ -4,8 +4,6 @@ Created on Wed Feb 18 08:02:13 2026
 
 @author: Faisal
 """
-from game_logic.utils import wilds
-
 class Ruleset:
     def __init__(self, config=None):
         config = config or {}
@@ -20,7 +18,7 @@ class Ruleset:
         self.max_meld_size_run = config.get('max_meld_size_run', None)
         
         #What wild cards exist? Created as a list, and any card that is in both this list and the dictionary should be removed from the dictionary. Wild cards can have  suits or ranks, but it doesnt matter.
-        self.wilds = wilds.append(config.get('wilds', ['Joker']))
+        self.wilds = config.get('wilds', ['Joker'])
         self.num_wilds = config.get('num_wilds', [0])
         
         #Scoring method. Negative scoring gives to winner negative points, and the loser gets points based off of the cards in their hands
@@ -32,6 +30,10 @@ class Ruleset:
         self.ace_both = config.get('ace_both',  True)
         self.ace_wrap_around = config.get('wrap_around', False)
         self.ace_high_score = config.get('ace_high_score', 10)
+    
+    def is_wild(self, card):
+        if card.rank in self.wilds:
+            return True
         
     
     def to_dict(self): #Exports the ruleset to a dictionary, so it can be saved and loaded.

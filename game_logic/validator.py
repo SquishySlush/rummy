@@ -9,7 +9,8 @@ from game_logic.utils import sort_rank, is_wild
 
 
 class validator:
-
+    
+    @staticmethod
     def validate_set(cards, ruleset):
         
         if len(cards) > ruleset.max_meld_size_set:
@@ -34,6 +35,7 @@ class validator:
                 else:
                     return False
     
+    @staticmethod
     def validate_run(cards, ruleset):
         if len(cards) > ruleset.max_meld_size_run:
             return False
@@ -52,13 +54,7 @@ class validator:
         
         return True
     
-    def validate_meld(self, cards, ruleset):
-        if len(cards) < ruleset.min_meld_size:
-            return False
-        
-        elif self.validate_set(cards, ruleset) or self.validate_run(cards, ruleset):
-            return True        
-
+    @staticmethod
     def  calculate_score(cards, ruleset):
         score = 0
         for card in cards:
@@ -67,6 +63,14 @@ class validator:
             else:
                 score += card.return_value
         return score
+    
+    def validate_meld(self, cards, ruleset):
+        if len(cards) < ruleset.min_meld_size:
+            return False
+        
+        elif self.validate_set(cards, ruleset) or self.validate_run(cards, ruleset):
+            return True        
+    
     
     def melding(self, cards, ruleset):
         if self.validate_meld(cards, ruleset):
