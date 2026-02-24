@@ -45,7 +45,12 @@ class Meld:
                 "rank_index": missing_index,
                 "rank": index_rank[missing_index],
                 "suit": sorted_non_wilds[0].suit}
-            
+            wilds.remove(wilds)
         
-        
+        if len(wilds) > 0:
+            for wild in wilds:
+                self.wild_assignments[wild] = {
+                    'rank_index': min(indices) - (len(wilds) - 1),
+                    'rank': index_rank[min(indices) - (len(wilds) - 1)],
+                    'suit': sorted_non_wilds[0].suit}
         
