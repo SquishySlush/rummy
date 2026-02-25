@@ -33,6 +33,23 @@ rank_index = { #Index of the cards. Used for meld validation and score.
 
 index_rank  = {value: key for key, value in rank_index.items()}
 
+
+rank_score = {
+    "Ace"  : 1,
+    "2" : 2,
+    "3" : 3,
+    "4" : 4,
+    "5" : 5,
+    "6" : 6,
+    "7" : 7,
+    "8" : 8,
+    "9" : 9,
+    "10" : 10,
+    "Jack" : 10,
+    "Queen" : 10,
+    "King" : 10}
+
+
 wilds = [] #list of all wild cards
 
 

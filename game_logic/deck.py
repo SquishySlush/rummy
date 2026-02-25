@@ -62,8 +62,3 @@ class Deck:
     #Appends a list of cards to the deck, e.g. all cards except top of a discard pile
     def add_cards(self, cards):
         self.cards.append(cards)
-    
-
-    
-
-

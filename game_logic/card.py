@@ -4,7 +4,7 @@ Created on Mon Feb 16 08:05:13 2026
 
 @author: Faisal
 """
-from game_logic.utils import Suit, rank_index, is_wild
+from game_logic.utils import Suit, rank_index, rank_score
 
 class Card:
     def __init__(self, rank, suit):
@@ -26,10 +26,8 @@ class Card:
     def __eq__(self, other): #Ewuality function changer, such that two cards with the same attributes are equal
         return self.rank == other.rank and self.suit == other.suit
 
-    def return_value(self): #Returning the value of a card, for melds.
-        if is_wild(self):
-            return "Wild"
-        if self.rank in ["Jack", "Queen", "King"]: #Jack, Queen, and king are always 10
-            return 10
+    def return_value(self, ruleset): #Returning the value of a card, for melds.
+        if  ruleset.is_wild(self):
+            return "wild"
         else:
-            return int(self.index + 1)  #Returns the index of the card, + 1 for all other values, as index starts at 0.
+            return rank_score[self.rank]

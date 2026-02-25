@@ -5,7 +5,7 @@ Created on Mon Feb 23 09:06:53 2026
 @author: Faisal
 """
 
-from game_logic.utils import sort_rank, index_rank, Suit
+from game_logic.utils import sort_rank, index_rank, Suit, rank_score
 
 class Meld:
     def __init__(self, cards, meld_type, ruleset):
@@ -14,19 +14,13 @@ class Meld:
         self.wild_assignments = {} #A dictionary of wild cards, with their rank_index and suit
         
         if meld_type == 'run':
-            self._wild_assignment_run(cards, ruleset)
+            self._wild_assignment_run(ruleset)
         else:
-            self._wild_assignment_set(cards, ruleset)
-    def _wild_assignment_run(self, cards, ruleset):
-        non_wilds = []
-        wilds = []        
+            self._wild_assignment_set(ruleset)
+    
+    def _wild_assignment_run(self, ruleset):
         
-        #Creates a list of wild and non wild cards
-        for card in cards:
-            if ruleset.is_wild(card):
-                wilds.append(card)
-            else:
-                non_wilds.append(card)       
+        wilds, non_wilds = self.split_meld(ruleset)
         
         #Creates a sorted list of the indices of non wild cards
         sorted_non_wilds = sort_rank(non_wilds)
@@ -43,49 +37,87 @@ class Meld:
             if index not in indices:
                 missing_indices.append(index)
         
+        #For each missing index and wild pair, create a dictionary of with the attributes of the card it is replacing
+        
+        #For wilds inbetween other cards
         for wild, missing_index in zip(wilds, missing_indices):
             self.wild_assignments[wild] = {
+                'score' : rank_score[index_rank[missing_index]],
                 "rank_index": missing_index,
                 "rank": index_rank[missing_index],
                 "suit": sorted_non_wilds[0].suit}
         
+        #For wilds at the end or beginning of a list. Defualts to start of list.
         if len(wilds) > 0:
             for i, wild in enumerate(wilds):
                 self.wild_assignments[wild] = {
+                    'score' : rank_score[index_rank[min(indices) - (len(wilds) - i)]],
                     'rank_index': min(indices) - (len(wilds) - i),
                     'rank': index_rank[min(indices) - (len(wilds) - i)],
                     'suit': sorted_non_wilds[0].suit}
     
     
-    def _wild_assignment_set(self, cards, ruleset):
+    def _wild_assignment_set(self, ruleset):
+        #Creates a list of all the suits from suit enum.
         suits = [Suit.Hearts, Suit.Clubs, Suit.Diamonds, Suit.Spades]
         
-        non_wilds = []
+        #Creates 2 lists, wild cards and non wilds
+
+        wilds , non_wilds =  self.split_meld(ruleset)
         
-        wilds = []
-        
-        for card in cards:
-            if ruleset.is_wild(card):
-                wilds.append(card)
-            else:
-                non_wilds.append(card)
-                
-        
+        #Creates a list of all the suits that are representetd in the non_wilds
         non_wild_suits = []
         
         for card in non_wilds:
             non_wild_suits.append(card.suit)
         
+        
+        #Creates a list of the missing suits
         missing_suits = []
         
         for suit in suits:
             if suit not in non_wild_suits:
                 missing_suits.append(suit)
         
+        #Matches wild card with one of the missing suits
         for i, wild in enumerate(wilds):
             self.wild_assignments[wild] = {
+                'score' : rank_score[index_rank[non_wilds[0].return_rank_index]],
                 'rank_index' : non_wilds[0].return_rank_index,
-                'rank' : index_rank[cards[0].return_rank_index],
+                'rank' : index_rank[non_wilds[0].return_rank_index],
                 'suit' : missing_suits[i]}
+            
+    
+    def _split_meld(self, ruleset):
         
+        wilds = []
+        non_wilds = []
         
+        for card in self.cards:
+            if ruleset.is_wild(card):
+                wilds.append(card)
+            else:
+                non_wilds.append(card)
+        
+        return wilds, non_wilds
+    
+    def return_meld_value(self, ruleset):
+        score = 0
+        
+        non_wilds = []
+        
+        wilds = []
+        
+        for card in self.cards:
+            if ruleset.is_wild(card):
+                wilds.append(card)
+            else:
+                non_wilds.append(card)
+        
+        for card in non_wilds:
+            score += card.return_value
+        
+        for wild in wilds:
+            score += self.wild_assignments[wild][score]
+        
+        return score

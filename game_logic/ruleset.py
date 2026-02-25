@@ -4,6 +4,10 @@ Created on Wed Feb 18 08:02:13 2026
 
 @author: Faisal
 """
+
+from game_logic.utils import rank_score
+import json
+
 class Ruleset:
     def __init__(self, config=None):
         config = config or {}
@@ -34,7 +38,13 @@ class Ruleset:
     def is_wild(self, card):
         if card.rank in self.wilds:
             return True
-        
+    def ace_score(self):
+        if self.ace_high:
+            rank_score['Ace'] = self.ace_high_score
+        elif self.ace_low:
+            rank_score['Ace'] = 1
+        elif self.ace_both:
+            rank_score['Ace'] = [1, self.ace_high_score]
     
     def to_dict(self): #Exports the ruleset to a dictionary, so it can be saved and loaded.
         return {'allow_sets' : self.allow_sets,
@@ -49,5 +59,14 @@ class Ruleset:
                 'ace_both' : self.ace_both,
                 'ace_high_score' : self.ace_high_score}
     
-        
-        
+    #Writes dictionary to json file
+    def to_json_file(self, filename):
+        with open(filename, 'w') as file:
+            json.dump(self.to_dict(), file, indent=4)
+    
+    #Retrieves dictionary from json file, returning cls(data)
+    @classmethod
+    def from_json_file(cls, filename):
+        with open(filename, 'r') as file:
+            data = json.load(file)
+        return cls(data)

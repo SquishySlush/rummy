@@ -5,19 +5,19 @@ Created on Wed Feb 18 11:33:37 2026
 @author: Faisal
 """
 
-from game_logic.utils import sort_rank, is_wild
+from game_logic.utils import sort_rank
 
 
 class validator:
     
     @staticmethod
-    def validate_set(cards, ruleset):
+    def validate_set(meld, ruleset):
         
-        if len(cards) > ruleset.max_meld_size_set:
+        if len(meld) > ruleset.max_meld_size_set:
             return False,  "Too many cards"
         
         ranks = []
-        for card in cards:
+        for card in meld:
             if card.is_wild != 1:
                 ranks.append(card.rank)
         if len(set(ranks)) != len(ranks):
@@ -25,7 +25,7 @@ class validator:
         
         else:
             suits = []
-            for card in cards:
+            for card in meld:
                 
                 if card.is_wild != 1:    
                     suits.append(card.suit.name)
@@ -36,10 +36,10 @@ class validator:
                     return False
     
     @staticmethod
-    def validate_run(cards, ruleset):
-        if len(cards) > ruleset.max_meld_size_run:
+    def validate_run(meld, ruleset):
+        if len(meld) > ruleset.max_meld_size_run:
             return False
-        cards = sort_rank(cards)
+        cards = sort_rank(meld)
         card1_index = cards[0].index
         cards_suits =  []
         for card in cards:
@@ -49,20 +49,10 @@ class validator:
                 return False
             
         for i in range(len(cards)):
-            if card1_index + i != cards[i].index and not is_wild(cards[i]):
+            if card1_index + i != cards[i].index and not ruleset.is_wild(cards[i]):
                 return False
         
         return True
-    
-    @staticmethod
-    def  calculate_score(cards, ruleset):
-        score = 0
-        for card in cards:
-            if card.rank == "Ace" and ruleset.ace_high:
-                score += ruleset.ace_high_score
-            else:
-                score += card.return_value
-        return score
     
     def validate_meld(self, cards, ruleset):
         if len(cards) < ruleset.min_meld_size:
@@ -77,5 +67,3 @@ class validator:
             return self.calculate_score(cards, ruleset)
         else:
             return False, "The meld is invalid"
-    
-    
