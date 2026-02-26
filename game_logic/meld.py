@@ -18,6 +18,11 @@ class Meld:
         else:
             self._wild_assignment_set(ruleset)
     
+    def __repr__(self):
+        for card in self.cards:
+            card_strings  = [str(card) for card in self.cards] #Creates a list of str(card) from self.cards
+        return card_strings
+        
     def _wild_assignment_run(self, ruleset):
         
         wilds, non_wilds = self.split_meld(ruleset)
@@ -82,9 +87,9 @@ class Meld:
         #Matches wild card with one of the missing suits
         for i, wild in enumerate(wilds):
             self.wild_assignments[wild] = {
-                'score' : rank_score[index_rank[non_wilds[0].return_rank_index]],
-                'rank_index' : non_wilds[0].return_rank_index,
-                'rank' : index_rank[non_wilds[0].return_rank_index],
+                'score' : non_wilds[0].return_value(),
+                'rank_index' : non_wilds[0].return_rank_index(),
+                'rank' : index_rank[non_wilds[0].return_rank_index()],
                 'suit' : missing_suits[i]}
             
     
@@ -104,20 +109,29 @@ class Meld:
     def return_meld_value(self, ruleset):
         score = 0
         
-        non_wilds = []
-        
-        wilds = []
-        
-        for card in self.cards:
-            if ruleset.is_wild(card):
-                wilds.append(card)
-            else:
-                non_wilds.append(card)
-        
-        for card in non_wilds:
-            score += card.return_value
+        wilds, non_wilds = self._split_meld(ruleset)
         
         for wild in wilds:
-            score += self.wild_assignments[wild][score]
+            score += self.wild_assignments[wild]['score']
+        
+        for card in non_wilds:
+            score += card.return_value()
         
         return score
+    
+    def add_card(self, card):
+        self.cards.append(card)
+    
+    def wild_card_comparison(self, card, wild, ruleset):
+        if not ruleset.wild_replace:
+            wild_assignment = self.wild_assignments[wild]
+            
+            return card.rank == wild_assignment['rank'] and card.suit  == wild_assignment['suit']
+        else:
+            return False
+    
+    def replace_wild(self,  card, wild):
+        self.cards.remove(wild)
+        self.cards.append(card)
+        
+        return wild

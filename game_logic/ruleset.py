@@ -20,6 +20,7 @@ class Ruleset:
         self.min_meld_size = config.get('min_meld_size', 3)
         self.max_meld_size_set = config.get('max_meld_size_set', 4)
         self.max_meld_size_run = config.get('max_meld_size_run', None)
+        self.min_initial_meld_score = config.get('min_initial_meld_score', 0)
         
         #What wild cards exist? Created as a list, and any card that is in both this list and the dictionary should be removed from the dictionary. Wild cards can have  suits or ranks, but it doesnt matter.
         self.wilds = config.get('wilds', ['Joker'])
@@ -38,6 +39,7 @@ class Ruleset:
     def is_wild(self, card):
         if card.rank in self.wilds:
             return True
+
     def ace_score(self):
         if self.ace_high:
             rank_score['Ace'] = self.ace_high_score
@@ -52,6 +54,7 @@ class Ruleset:
                 'min_meld_size' : self.min_meld_size,
                 'max_meld_size_set' : self.max_meld_size_set,
                 'max_meld_size_run' : self.max_meld_size_run,
+                'min_initial_meld_score' : self.min_initial_meld_score,
                 'wilds' : self.wilds,
                 'num_wilds' : self.num_wilds,
                 'scoring_method' : self.scoring_method,

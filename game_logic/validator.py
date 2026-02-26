@@ -8,13 +8,13 @@ Created on Wed Feb 18 11:33:37 2026
 from game_logic.utils import sort_rank
 
 
-class validator:
+class Validator:
     
     @staticmethod
     def validate_set(meld, ruleset):
         
         if len(meld) > ruleset.max_meld_size_set:
-            return False,  "Too many cards"
+            return False
         
         ranks = []
         for card in meld:
@@ -54,16 +54,12 @@ class validator:
         
         return True
     
-    def validate_meld(self, cards, ruleset):
-        if len(cards) < ruleset.min_meld_size:
-            return False
-        
-        elif self.validate_set(cards, ruleset) or self.validate_run(cards, ruleset):
-            return True        
-    
-    
-    def melding(self, cards, ruleset):
-        if self.validate_meld(cards, ruleset):
-            return self.calculate_score(cards, ruleset)
+    @staticmethod
+    def validate_meld(cards, ruleset):
+        if not len(cards) < ruleset.min_meld_size:
+            if Validator.validate_set(cards, ruleset):
+                return True,  'set'
+            elif Validator.validate_run(cards, ruleset):
+                return True, 'run'
         else:
-            return False, "The meld is invalid"
+            return False
