@@ -16,12 +16,18 @@ class Discard_pile:
         return self.cards.pop()
     
     def split_discard_pile(self):
-        card = self.cards.pop()
-        cards = self.cards
         
-        self.cards = card
+        #Makes the top card the discard pile, the only card in the discard pile. All other cards are returned. This is when the deck has 0 cards, so all other cards can be appended to the deck, and then reshuffled.
         
-        return cards
+        if len(self.cards) <= 1:
+            return []
+            
+        top_card = self.cards[-1]
+        cards_to_reshuffle = self.cards[:-1]
+        
+        self.cards = [top_card]
+        
+        return cards_to_reshuffle
     
     def return_top_card(self):
         return self.cards[-1]
