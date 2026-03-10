@@ -37,7 +37,10 @@ class Ruleset:
         self.ace_both = config.get('ace_both',  True)
         self.ace_wrap_around = config.get('wrap_around', False)
         self.ace_high_score = config.get('ace_high_score', 10)
-    
+        
+        self.initial_hand_size = config.get('initial_hand_size', 14)
+        self.num_decks = config.get('num_decks', 2)
+        
     def is_wild(self, card):
         if card.rank in self.wilds:
             return True
@@ -58,6 +61,8 @@ class Ruleset:
                 'max_meld_size_run' : self.max_meld_size_run,
                 'min_initial_meld_score' : self.min_initial_meld_score,
                 'initial_meld_increment' : self.initial_meld_increment,
+                'initial_hand_size' : self.initial_hand_size,
+                'num_decks' : self.num_decks,
                 'wilds' : self.wilds,
                 'num_wilds' : self.num_wilds,
                 'scoring_method' : self.scoring_method,

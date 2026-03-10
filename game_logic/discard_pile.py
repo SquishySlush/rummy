@@ -6,8 +6,8 @@ Created on Thu Feb 26 09:14:35 2026
 """
 
 class Discard_pile:
-    def __init__(self, cards):
-        self.cards = cards
+    def __init__(self):
+        self.cards = []
     
     def add_card(self, card):
         self.cards.append(card)
