@@ -10,6 +10,8 @@ from game_logic.ruleset import Ruleset
 from game_logic.hand import Hand
 from game_logic.discard_pile import Discard_pile
 from game_logic.player import Player
+from game_logic.validator import Validator
+
 
 from enum import Enum
 
@@ -32,6 +34,7 @@ class GameState:
         self.deck = None
         self.discard_pile = None
         self.table_melds = []
+        self.winner = None
         
         self.current_player_index = 0
     
@@ -74,3 +77,34 @@ class GameState:
         
         if self.deck.empty_check():
             self.deck.add_cards(self.discard_pile.split_discard_pile())
+            self.deck.shuffle()
+        
+        card = self.deck.draw()
+        player.hand.add_card(card)
+        return True, f"Drew {card}"
+
+    def draw_from_discard_pile(self, player):
+        if self.discard_pile.is_empty():
+            return False, "Discard Pile Empty"
+        
+        card = self.discard_pile.draw_top_card()
+        player.hand.add_card(card)
+        return True, f"Drew {card}"
+    
+    def check_win_condition(self, player):
+        if player.hand.is_empty():
+            self.game_state = GameStatus.GAME_OVER
+            self.winner = player
+    
+    def is_game_over(self):
+        return self.game_state
+    
+    def return_winner(self):
+        return self.winner
+    
+    def play_player_meld(self, player):
+        if not player.has_melded:
+            if player.score >= self.ruleset.initial_meld_score:
+                if 
+        if Validator.validate_meld(player.stored_melds, self.ruleset):
+            

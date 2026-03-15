@@ -93,4 +93,6 @@ class Player:
     
     def reset_player(self):
         self.hand.cards = []
-        
+        self.has_melded = False
+        self.stored_melds = []
+        self.score = 0

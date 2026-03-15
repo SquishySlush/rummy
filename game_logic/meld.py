@@ -21,7 +21,7 @@ class Meld:
     def __repr__(self):
         for card in self.cards:
             card_strings  = [str(card) for card in self.cards] #Creates a list of str(card) from self.cards
-        return card_strings
+        return ',' .join(card_strings)
         
     def _wild_assignment_run(self, ruleset):
         
@@ -45,12 +45,19 @@ class Meld:
         #For each missing index and wild pair, create a dictionary of with the attributes of the card it is replacing
         
         #For wilds inbetween other cards
+        assigned_wilds = []
+        
         for wild, missing_index in zip(wilds, missing_indices):
             self.wild_assignments[wild] = {
                 'score' : rank_score[index_rank[missing_index]],
                 "rank_index": missing_index,
                 "rank": index_rank[missing_index],
                 "suit": sorted_non_wilds[0].suit}
+            assigned_wilds.append(wild)
+        
+        for wild in assigned_wilds:
+            wilds.remove(wild)
+        
         
         #For wilds at the end or beginning of a list. Defualts to start of list.
         if len(wilds) > 0:
@@ -93,7 +100,7 @@ class Meld:
                 'suit' : missing_suits[i]}
             
     
-    def _split_meld(self, ruleset):
+    def split_meld(self, ruleset):
         
         wilds = []
         non_wilds = []
@@ -106,24 +113,50 @@ class Meld:
         
         return wilds, non_wilds
     
+    def return_card_value(self, card, ruleset):
+        if ruleset.is_wild(card):
+            return self.wild_assignments[card]['score']
+        
+        if card.rank == "Ace":
+            if self.meld_type == "set":
+                if ruleset.ace_both or ruleset.ace_high:
+                    return ruleset.ace_high_score
+                else:
+                    return 1
+        
+            if self.meld_type == "run":
+                if self._is_ace_high_in_run(card):
+                    return ruleset.ace_high_score
+                else:
+                    return 1
+        
+        return card.return_value()
+    
+    def _is_ace_high_in_run(self, ace_card, ruleset):
+        other_cards = [card for card in self.cards 
+                       if card.rank != "Ace" and not ruleset.is_wild(card)]
+        
+        has_king = any(card.rank == "King" for card in other_cards)
+        
+        for wild in self.wild_assignments:
+            if self.wild_assignments[wild]['rank'] == "King":
+                has_king = True
+                break
+        return has_king
+    
+    
     def return_meld_value(self, ruleset):
         score = 0
         
-        wilds, non_wilds = self._split_meld(ruleset)
-        
-        for wild in wilds:
-            score += self.wild_assignments[wild]['score']
-        
-        for card in non_wilds:
-            score += card.return_value()
-        
+        for card in self.cards:
+           score += self.return_card_value(card, ruleset)
+          
         return score
-    
     def add_card(self, card):
         self.cards.append(card)
     
     def wild_card_comparison(self, card, wild, ruleset):
-        if not ruleset.wild_replace:
+        if ruleset.allow_wild_replacements:
             wild_assignment = self.wild_assignments[wild]
             
             return card.rank == wild_assignment['rank'] and card.suit  == wild_assignment['suit']
@@ -133,5 +166,8 @@ class Meld:
     def replace_wild(self,  card, wild):
         self.cards.remove(wild)
         self.cards.append(card)
+        
+        if wild in self.wild_assignments:
+            del self.wild_assignments[wild]
         
         return wild

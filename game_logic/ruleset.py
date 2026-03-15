@@ -5,54 +5,195 @@ Created on Wed Feb 18 08:02:13 2026
 @author: Faisal
 """
 
-from game_logic.utils import rank_score
 import json
 
 class Ruleset:
     def __init__(self, config=None):
         config = config or {}
         
-        #Are sets or runs allows, or both. At least one should be enabled, otherwise the game is imposible to finish.
-        self.allow_sets = config.get('allow_sets', True)
-        self.allow_runs = config.get('allow_runs', True)
+        # Are sets or runs allows, or both. 
+        # At least one should be enabled, otherwise 
+        # the game is imposible to finish.
+        self.allow_sets = self._get_validated(
+            config, 
+            'allow_sets', 
+            True, 
+            bool)
+        
+        self.allow_runs = self._get_validated(
+            config, 
+            'allow_runs', 
+            True, 
+            bool)
         
         #Meld size limitations.
-        self.min_meld_size = config.get('min_meld_size', 3)
-        self.max_meld_size_set = config.get('max_meld_size_set', 4)
-        self.max_meld_size_run = config.get('max_meld_size_run', None)
-        self.min_initial_meld_score = config.get('min_initial_meld_score', 0)
-        self.initial_meld_increment = config.get('initial_meld_increment', 0)
+        self.min_meld_size = self._get_validated(
+            config, 
+            'min_meld_size', 
+            3, 
+            int,
+            None,
+            1,
+            self.initial_hand_size)
+        
+        self.max_meld_size_set = self._get_validated(
+            config, 
+            'max_meld_size_set', 
+            4, 
+            int,
+            None,
+            1,
+            self.initial_hand_size)
+        
+        self.max_meld_size_run = self._get_validated(
+            config, 
+            'max_meld_size_run', 
+            None, 
+            int,
+            None,
+            1,
+            None)
+        
+        self.min_initial_meld_score = self._get_validated(
+            config, 
+            'min_initial_meld_score', 
+            0, 
+            int,
+            None,
+            0,
+            None)
+        
+        self.initial_meld_increment = self._get_validated(
+            config, 
+            'initial_meld_increment', 
+            0, 
+            int,
+            None,
+            0,
+            None)
         
         #What wild cards exist? Created as a list, and any card that is in both this list and the dictionary should be removed from the dictionary. Wild cards can have  suits or ranks, but it doesnt matter.
-        self.wilds = config.get('wilds', ['Joker'])
-        self.num_wilds = config.get('num_wilds', [0])
-        self.wild_deadwood_score = config.get('wild_deadwood_score', 25)
+        self.wilds = self._get_validated(
+            config, 
+            'wilds', 
+            ['joker'], 
+            list)
+        
+        self.num_wilds = self._get_validated(
+            config, 
+            'num_wilds', 
+            [0], 
+            list)
+        
+        self.wild_deadwood_score = self._get_validated(
+            config, 
+            'wild_deadwood_score', 
+            25,
+            int,
+            None,
+            0,
+            None)
+        
         
         #Scoring method. Negative scoring gives to winner negative points, and the loser gets points based off of the cards in their hands
-        self.scoring_method = config.get('scoring_method', 'negative')
+        self.scoring_method = self._get_validated(
+            config, 
+            'scoring_method', 
+            'negative', 
+            str,
+            ['negative', 'positve'])
         
         #Ace settings, for ace low, high,, both, and wrap around. Wrap around aces can go King, Ace, 2.
-        self.ace_low = config.get('ace_high', False)
-        self.ace_high = config.get('ace_high', False)
-        self.ace_both = config.get('ace_both',  True)
-        self.ace_wrap_around = config.get('wrap_around', False)
-        self.ace_high_score = config.get('ace_high_score', 10)
+        self.ace_low = self._get_validated(
+            config, 
+            'ace_low', 
+            False, 
+            bool)
         
-        self.initial_hand_size = config.get('initial_hand_size', 14)
-        self.num_decks = config.get('num_decks', 2)
+        self.ace_high = self._get_validated(
+            config, 
+            'ace_high', 
+            False, 
+            bool)
         
+        self.ace_both = self._get_validated(
+            config, 
+            'ace_both', 
+            True, 
+            bool)
+        
+        self.ace_wrap_around = self._get_validated(
+            config, 
+            'wrap_around', 
+            False, 
+            bool)
+        
+        self.ace_high_score = self._get_validated(
+            config, 
+            'ace_high_score', 
+            10, 
+            int, 
+            None, 
+            1)
+        
+        
+        self.initial_hand_size = self._get_validated(
+            config, 
+            'initial_hand_size', 
+            14, 
+            int,
+            None, 
+            1)
+        
+        self.num_decks = self._get_validated(
+            config, 
+            'num_decks', 
+            2, 
+            int, 
+            None, 
+            1)
+        
+        self.require_melding_to_draw_from_disc = self._get_validated(
+            config, 
+            'require_melding_to_draw_from_disc', 
+            True, 
+            bool)
+        
+        self.allow_wild_replacement = self._get_validated(
+            config, 
+            'allow_wild_replacement', 
+            True, 
+            bool)
+    
+    def _get_validated(
+            self, 
+            config, 
+            key, 
+            default, 
+            expected_type, 
+            allowed_values=None, 
+            min_value=None, 
+            max_value=None):
+        
+        value = config.get(key, default)
+        
+        if value is not None or not isinstance(value, expected_type):
+            return default
+        if allowed_values is not None and value not in allowed_values:
+            return default
+        
+        if min_value is not None and value < min_value:
+            return default
+        if max_value is not None and value > max_value:
+            return default
+        
+        return value
+        
+    
     def is_wild(self, card):
         if card.rank in self.wilds:
             return True
 
-    def ace_score(self):
-        if self.ace_high:
-            rank_score['Ace'] = self.ace_high_score
-        elif self.ace_low:
-            rank_score['Ace'] = 1
-        elif self.ace_both:
-            rank_score['Ace'] = [1, self.ace_high_score]
-    
     def to_dict(self): #Exports the ruleset to a dictionary, so it can be saved and loaded.
         return {'allow_sets' : self.allow_sets,
                 'allow_runs' : self.allow_runs,

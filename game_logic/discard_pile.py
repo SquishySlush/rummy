@@ -31,3 +31,9 @@ class Discard_pile:
     
     def return_top_card(self):
         return self.cards[-1]
+    
+    def is_empty(self):
+        if len(self.cards) == 0:
+            return True
+        else:
+            return False

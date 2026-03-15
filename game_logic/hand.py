@@ -60,3 +60,9 @@ class Hand:
                 items_spades.append(i)
         
         return self.sort_rank(items_hearts) + self.sort_rank(items_clubs)  + self.sort_rank(items_diamonds) + self.sort_rank(items_spades)
+    
+    def is_empty(self):
+        if len(self.cards) == 0:
+            return True
+        else:
+            False
