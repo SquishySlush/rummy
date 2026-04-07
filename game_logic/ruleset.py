@@ -7,6 +7,7 @@ Created on Wed Feb 18 08:02:13 2026
 
 import json
 
+
 class Ruleset:
     def __init__(self, config=None):
         config = config or {}
@@ -27,23 +28,7 @@ class Ruleset:
             bool)
         
         #Meld size limitations.
-        self.min_meld_size = self._get_validated(
-            config, 
-            'min_meld_size', 
-            3, 
-            int,
-            None,
-            1,
-            self.initial_hand_size)
-        
-        self.max_meld_size_set = self._get_validated(
-            config, 
-            'max_meld_size_set', 
-            4, 
-            int,
-            None,
-            1,
-            self.initial_hand_size)
+
         
         self.max_meld_size_run = self._get_validated(
             config, 
@@ -66,24 +51,16 @@ class Ruleset:
         self.initial_meld_increment = self._get_validated(
             config, 
             'initial_meld_increment', 
-            0, 
-            int,
-            None,
-            0,
-            None)
-        
+            False, 
+            bool)
+                    
         #What wild cards exist? Created as a list, and any card that is in both this list and the dictionary should be removed from the dictionary. Wild cards can have  suits or ranks, but it doesnt matter.
         self.wilds = self._get_validated(
             config, 
             'wilds', 
-            ['joker'], 
+            [("Joker", 0)], 
             list)
         
-        self.num_wilds = self._get_validated(
-            config, 
-            'num_wilds', 
-            [0], 
-            list)
         
         self.wild_deadwood_score = self._get_validated(
             config, 
@@ -145,6 +122,24 @@ class Ruleset:
             None, 
             1)
         
+        self.min_meld_size = self._get_validated(
+            config, 
+            'min_meld_size', 
+            3, 
+            int,
+            None,
+            1,
+            self.initial_hand_size)
+        
+        self.max_meld_size_set = self._get_validated(
+            config, 
+            'max_meld_size_set', 
+            4, 
+            int,
+            None,
+            1,
+            self.initial_hand_size)
+        
         self.num_decks = self._get_validated(
             config, 
             'num_decks', 
@@ -164,7 +159,20 @@ class Ruleset:
             'allow_wild_replacement', 
             True, 
             bool)
+        
     
+        self.allow_wild_only_melds = self._get_validated(
+            config, 
+            'allow_wild_only_melds',
+            False, 
+            bool)
+        
+        self.prevent_discard_same_card = self._get_validated(
+            config, 
+            'prevent_discard_same_card', 
+            True, 
+            bool)
+        
     def _get_validated(
             self, 
             config, 
@@ -177,7 +185,7 @@ class Ruleset:
         
         value = config.get(key, default)
         
-        if value is not None or not isinstance(value, expected_type):
+        if value is None or not isinstance(value, expected_type):
             return default
         if allowed_values is not None and value not in allowed_values:
             return default
@@ -191,8 +199,7 @@ class Ruleset:
         
     
     def is_wild(self, card):
-        if card.rank in self.wilds:
-            return True
+        return any(card.rank == t[0] for t in self.wilds)
 
     def to_dict(self): #Exports the ruleset to a dictionary, so it can be saved and loaded.
         return {'allow_sets' : self.allow_sets,
@@ -205,7 +212,6 @@ class Ruleset:
                 'initial_hand_size' : self.initial_hand_size,
                 'num_decks' : self.num_decks,
                 'wilds' : self.wilds,
-                'num_wilds' : self.num_wilds,
                 'scoring_method' : self.scoring_method,
                 'ace_high' : self.ace_high,
                 'ace_both' : self.ace_both,

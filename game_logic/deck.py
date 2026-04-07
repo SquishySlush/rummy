@@ -8,43 +8,36 @@ from game_logic.utils import rank_index, Suit
 from game_logic.card import Card
 import random
 
+local_rank_index = rank_index.copy()
+
 class Deck:
     
     #when  the deck initiaises, creates a full deck of cards + jokers depending on the number of jokers chosen.
     
-    def __init__(self, ruleset):
+    def __init__(self, ruleset, seed=None): #Default creates no seed
+        if seed is None:
+            seed = random.SystemRandom().randint(0, 2**32 -1) #if no seed is selected, use the OS' random number generator to make a 32bit seed
         
         #num_wilds is a list, where each index corresponds to an index in wilds.
         self.cards = []
-        self.num_wilds =  ruleset.num_wilds
+        self.seed = seed
+        self.rng = random.Random(seed)
         
-        for deck in ruleset.num_decks:
-        #Removes wild cards from rank_index, so that it doesnt generate twice
-            for card in ruleset.wilds:
-                if card in rank_index:
-                    del rank_index[card]
-                
-                
-                for  rank in rank_index:
+        for deck in range(ruleset.num_decks):
+            for rank in rank_index:
+                if rank not in ruleset.wilds:
                     for suit in Suit:
-                        self.cards.append(Card(rank, suit, 0))
+                        self.cards.append(Card(rank, suit, ruleset))
+        for wild, num_wild in ruleset.wilds:
+            for i in range(num_wild):
+                self.cards.append(Card(wild, None, ruleset))
     
-        #Creates wild cards with
+
     
-        for i in range(len(ruleset.wilds)): 
-            for j in range(self.num_wilds[i]):
-                self.cards.append(Card(ruleset.wilds[i], ''))
-    
-    #Shuffles the deck, by moving each card to a random position in the deck. This is used in unison with the draw function to have an O(1) when drawing a card, as otherwise it would have to choose a random card everytime, with an O(n) time complexity. 
-    
-    def shuffle(self):
-        result = []
-        for i in range(len(self.cards)):
-            roll = random.randint(0, len(self.cards)-1)
-            result.append(self.cards[roll])
-            self.cards.remove(self.cards[roll])
-        self.cards  = result
-    
+    def shuffle(self): #Shuffles the deck, by moving each card to a random position in the deck
+        for i in range(len(self.cards) -1, 0, -1): #goes backwards through the list, random card is chosen and swaps place with the current i
+            roll = self.rng.randint(0, i)
+            self.cards[i], self.cards[roll] = self.cards[roll], self.cards[i]    
     
     #Returns the top card of the deck, while removing it.
     def draw(self):
@@ -61,4 +54,5 @@ class Deck:
     
     #Appends a list of cards to the deck, e.g. all cards except top of a discard pile
     def add_cards(self, cards):
-        self.cards.append(cards)
+        self.cards.extend(cards)
+

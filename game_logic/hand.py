@@ -44,6 +44,11 @@ class Hand:
     def sort_by_suit(self):
         self.cards = self.sort_suit(self.cards)
     
+    def swap_card(self, card1, card2):
+        index1, index2 = self.cards.index(card1), self.cards.index(card2)
+        
+        self.cards[index1], self.cards[index2] = self.cards[index2], self.cards[index1]
+    
     def sort_suit(self, items): #Split cards by suit, before sorting each on its own. It then sorts each individually using sort_rank, before joining them together.
         items_hearts = []
         items_clubs = []
@@ -52,11 +57,11 @@ class Hand:
         for i in items:
             if i.suit.value == 0:
                 items_hearts.append(i)
-            if i.suit.value == 1:
+            elif i.suit.value == 1:
                 items_clubs.append(i)
-            if i.suit.value == 2:
+            elif i.suit.value == 2:
                 items_diamonds.append(i)
-            if i.suit.value == 3:
+            elif i.suit.value == 3:
                 items_spades.append(i)
         
         return self.sort_rank(items_hearts) + self.sort_rank(items_clubs)  + self.sort_rank(items_diamonds) + self.sort_rank(items_spades)
@@ -65,4 +70,4 @@ class Hand:
         if len(self.cards) == 0:
             return True
         else:
-            False
+            return False

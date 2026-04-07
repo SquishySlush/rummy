@@ -1,20 +1,43 @@
 from enum import Enum
 
-def sort_rank(items): #Backend of sorting by rank, standard quicksort algorithm
+def sort_rank(cards): #Backend of sorting by rank, standard quicksort algorithm
+    ranks = []
+    for card in cards:
+        ranks.append(card.return_rank_index())
+    
+    return quicksort(ranks)
+
+def quicksort(items):
+    items = items.copy()
+    
     if len(items) <= 1:
         return items
-    pivot_card = items.pop()
-    pivot_index = pivot_card.return_rank_index()
+    
+    pivot = items.pop
     items_greater = []
-    items_lower = []
-        
-    for i in items:
-        if i.return_rank_index() > pivot_index:
-            items_greater.append(i)
+    items_lesser = []
+    
+    for item in items:
+        if item > pivot:
+            items_greater.append(item)
         else:
-            items_lower.append(i)
-    return sort_rank(items_lower) + [pivot_card] + sort_rank(items_greater)
+            items_lesser.append(item)
+    
+    return quicksort(items_lesser) + pivot + quicksort(items_greater)
 
+
+def split_wilds_non_wilds(cards, ruleset):
+    
+    wilds = []
+    non_wilds = []
+    
+    for card in cards:
+        if ruleset.is_wild(card):
+            wilds.append(card)
+        else:
+            non_wilds.append(card)
+    
+    return wilds, non_wilds
 
 #Index of the cards. Used for meld validation.
 rank_index = {
@@ -60,3 +83,19 @@ class Suit(Enum):
     Clubs = 1
     Diamonds = 2
     Spades = 3
+
+class Moves(Enum):
+    
+    #Creates an immutable enum for the available moves, along with their notation
+    
+    Draw_Deck = "Draw From Deck"
+    Draw_Discard = "Draw From Discard Pile"
+    Discard = "Discard Card"
+    Meld = "Meld Card"
+    Lay_Off = "Lay Off Card"    
+    Deck_Shuffle = "Shuffles the Deck"
+    
+class MeldTypes(Enum):
+    
+    RUN = "run"
+    SET = "set"

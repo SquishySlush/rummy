@@ -102,9 +102,4 @@ class GameState:
     def return_winner(self):
         return self.winner
     
-    def play_player_meld(self, player):
-        if not player.has_melded:
-            if player.score >= self.ruleset.initial_meld_score:
-                if 
-        if Validator.validate_meld(player.stored_melds, self.ruleset):
             
