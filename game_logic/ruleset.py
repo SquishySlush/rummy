@@ -154,6 +154,12 @@ class Ruleset:
             True, 
             bool)
         
+        self.require_melding_to_lay_off = self._get_validated(
+            config, 
+            'require_melding_to_lay_off', 
+            True, 
+            bool)
+        
         self.allow_wild_replacement = self._get_validated(
             config, 
             'allow_wild_replacement', 
@@ -173,6 +179,24 @@ class Ruleset:
             True, 
             bool)
         
+        self.points_for_winning = self._get_validated(
+            config, 
+            'points_for_winning', 
+            25, 
+            int)
+        
+        self.max_deck_shuffle = self._get_validated(
+            config, 
+            'max_deck_shuffle', 
+            None, 
+            int)
+            
+        self.winner_deadwood = self._get_validated(
+            config, 
+            'winner_deadwood', 
+            25, 
+            int)        
+        
     def _get_validated(
             self, 
             config, 
@@ -185,7 +209,7 @@ class Ruleset:
         
         value = config.get(key, default)
         
-        if value is None or not isinstance(value, expected_type):
+        if value is not None and not isinstance(value, expected_type):
             return default
         if allowed_values is not None and value not in allowed_values:
             return default

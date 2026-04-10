@@ -24,22 +24,25 @@ class Discard_pile:
         
         return True, self.cards.pop()
     
-    # def split_discard_pile(self):
+    def split_discard_pile(self):
         
-    #     #Makes the top card the discard pile, the only card in the discard pile. All other cards are returned. This is when the deck has 0 cards, so all other cards can be appended to the deck, and then reshuffled.
+        #Makes the top card the discard pile, the only card in the discard pile. All other cards are returned. This is when the deck has 0 cards, so all other cards can be appended to the deck, and then reshuffled.
         
-    #     if len(self.cards) <= 1:
-    #         return []
+        if len(self.cards) <= 1:
+            return []
             
-    #     top_card = self.cards[-1]
-    #     cards_to_reshuffle = self.cards[:-1]
+        top_card = self.cards[-1]
+        cards_to_reshuffle = self.cards[:-1]
         
-    #     self.cards = [top_card]
+        self.cards = [top_card]
         
-    #     return cards_to_reshuffle
+        return cards_to_reshuffle
     
     def is_empty(self):
         if len(self.cards) == 0:
             return True
         else:
             return False
+    
+    def peek(self):
+        return self.cards[-1]

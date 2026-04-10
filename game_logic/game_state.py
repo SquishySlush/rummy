@@ -12,7 +12,6 @@ from game_logic.discard_pile import Discard_pile
 from game_logic.player import Player
 from game_logic.validator import Validator
 
-
 from enum import Enum
 
 class GameStatus(Enum):
@@ -26,7 +25,7 @@ class GameState:
         self.ruleset = ruleset or Ruleset()
         self.game_state = GameStatus.LOBBY
         
-        self.players - [] #list of player objects
+        self.players = [] #list of player objects
         for i, p_id in enumerate((player_ids)):
             player = Player(p_id, player_names[i], Hand())
             self.players.append(player)
@@ -35,6 +34,7 @@ class GameState:
         self.discard_pile = None
         self.table_melds = []
         self.winner = None
+        self.current_required_meld_score = self.ruleset.min_initial_meld_score
         
         self.current_player_index = 0
     
@@ -46,7 +46,7 @@ class GameState:
         return True, "Rules Updated"
         
     def start_game(self):
-        if self.status != GameStatus.LOBBY:
+        if self.game_state != GameStatus.LOBBY:
             return False, "Game Already Started"
         #Initialises the game and deals cards
         self.game_state = GameStatus.IN_PROGRESS
@@ -75,31 +75,96 @@ class GameState:
     
     def draw_from_deck(self, player):
         
-        if self.deck.empty_check():
-            self.deck.add_cards(self.discard_pile.split_discard_pile())
-            self.deck.shuffle()
+        valid, error = Validator.validate_draw(self.deck.peek, self.deck, player.has_drawn)
         
-        card = self.deck.draw()
-        player.hand.add_card(card)
-        return True, f"Drew {card}"
-
+        if valid:
+            player.add_card(self.deck.draw())
+            player.has_drawn = True
+            return True, None
+        else:
+            return valid, error
+        
     def draw_from_discard_pile(self, player):
-        if self.discard_pile.is_empty():
-            return False, "Discard Pile Empty"
+        valid, error = Validator.validate_draw_discard(self.discard_pile.peek(), self.discard_pile, player.has_drawn, player.has_melded, player.ruleset)
+        if valid:
+            card = self.discard_pile.draw_top_card()
+            player.add_card(card)
+            player.has_drawn = True
+            player.drawn_from_discard_pile = card
+            return valid, None
+        else:
+            return valid, error
+                
+                
+    def play_stored_melds(self, ruleset, player):
+            
+        success, error_or_stored_melds = Validator.validate_play_melds(player.current_stored_melds, player.has_melded, ruleset, self.current_required_meld_score)
         
-        card = self.discard_pile.draw_top_card()
-        player.hand.add_card(card)
-        return True, f"Drew {card}"
+        if not success:
+            return success, error_or_stored_melds
+                
+        for meld in player.stored_melds:
+            for card in meld.cards:
+                player.hand.remove_card(card)
+        
+        self.table_melds += player.current_stored_melds
+        
+        self.update_required_meld_score(player.return_stored_meld_score(ruleset))
+        
+        player.completed_stored_melds += player.current_stored_melds
+        
+        player.reset_current_stored_melds()
+        
+        return success, error_or_stored_melds
+        
+    def discard(self, player, card):
+        
+        valid, error = Validator.validate_discard(card, player.hand.cards, self.discard_pile, player.has_drawn, player.has_drawn_from_discard, self.ruleset)
+        
+        if valid:
+            player.hand.remove_card(card)
+            self.discard_pile.add_card(card)
+            return True, None
+        else:
+            return False, error
+    
+    def lay_off(self, player, card, meld):
+        
+        valid, error = Validator.validate_lay_off(card, meld, self.ruleset)
+        
+        if valid:
+            player.hand.remove_card(card)
+            meld.add_card(card)
+            return True, None
+        else:
+            return False, error
+        
+    def update_required_meld_score(self, score):
+        if self.ruleset.initial_meld_increment:
+            if self.current_required_meld_score < score:
+                self.current_required_meld_score = score
+    
+    def _game_end(self, winning_player):
+        for player in self.players:
+            if player != winning_player:
+                deadwood = player.hand.calculate_deadwood(self.ruleset)
+                player.add_to_score(self.ruleset, -deadwood)
+            self.ruleset.winner_deadwood
+            winning_player.add_to_score(self.ruleset, deadwood)
     
     def check_win_condition(self, player):
         if player.hand.is_empty():
             self.game_state = GameStatus.GAME_OVER
             self.winner = player
+            self._game_end(self.winner)
+            return self.winner
+        else:
+            return None
+        
     
-    def is_game_over(self):
+    def return_game_state(self):
         return self.game_state
     
     def return_winner(self):
         return self.winner
-    
             

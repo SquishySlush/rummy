@@ -71,3 +71,13 @@ class Hand:
             return True
         else:
             return False
+    
+    def calculate_deadwood(self, ruleset):
+        deadwood_score = 0
+        for card in self.cards:
+            if ruleset.is_wild(card):
+                deadwood_score += ruleset.wild_deadwood_score
+            else:
+                deadwood_score += card.return_value()
+        
+        return deadwood_score

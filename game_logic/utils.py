@@ -1,4 +1,5 @@
 from enum import Enum
+    
 
 def sort_rank(cards): #Backend of sorting by rank, standard quicksort algorithm
     ranks = []
@@ -83,19 +84,3 @@ class Suit(Enum):
     Clubs = 1
     Diamonds = 2
     Spades = 3
-
-class Moves(Enum):
-    
-    #Creates an immutable enum for the available moves, along with their notation
-    
-    Draw_Deck = "Draw From Deck"
-    Draw_Discard = "Draw From Discard Pile"
-    Discard = "Discard Card"
-    Meld = "Meld Card"
-    Lay_Off = "Lay Off Card"    
-    Deck_Shuffle = "Shuffles the Deck"
-    
-class MeldTypes(Enum):
-    
-    RUN = "run"
-    SET = "set"

@@ -39,6 +39,9 @@ class Deck:
             roll = self.rng.randint(0, i)
             self.cards[i], self.cards[roll] = self.cards[roll], self.cards[i]    
     
+    def peek(self):
+        return self.cards[-1]
+    
     #Returns the top card of the deck, while removing it.
     def draw(self):
         return self.cards.pop()
