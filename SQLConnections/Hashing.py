@@ -22,7 +22,7 @@ def simple_hash(input_str, salt):
     
     return hash_vector
 
-def hash_pasword(password):
+def hash_password(password):
     salt = os.urandom(8).hex()
     hash_value = simple_hash(password, salt)
     

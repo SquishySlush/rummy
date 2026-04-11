@@ -13,7 +13,7 @@ class Player:
         self.player_id = player_id
         self.name = name
         self.hand = hand
-        self.curent_stored_melds = []
+        self.current_stored_melds = []
         self.completed_stored_melds = []
         self.score = 0
         self.has_melded = False
@@ -41,14 +41,6 @@ class Player:
             score += meld.return_meld_value(ruleset)
         
         return score
-    
-    def lay_off_card(self, card, meld, ruleset):
-        
-        valid, error = Validator.validate_lay_off(card, meld, ruleset)
-        if valid:
-            self.hand.remove_card(card)
-        else:
-            return valid, error
         
     
     def add_to_score(self, ruleset, points):

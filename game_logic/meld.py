@@ -5,7 +5,7 @@ Created on Mon Feb 23 09:06:53 2026
 @author: Faisal
 """
 
-from game_logic.utils import sort_rank, index_rank, Suit, rank_score, MeldTypes, split_wilds_non_wilds, quicksort
+from game_logic.utils import index_rank, Suit, rank_score, MeldTypes, split_wilds_non_wilds, quicksort
 
 class Meld:
     def __init__(self, cards, meld_type, ruleset):

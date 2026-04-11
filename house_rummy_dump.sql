@@ -18,49 +18,100 @@ USE `house_rummy`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Dumping data for table `FriendsList`
+-- Table structure for table `FriendsList`
 --
 
-LOCK TABLES `FriendsList` WRITE;
-/*!40000 ALTER TABLE `FriendsList` DISABLE KEYS */;
-/*!40000 ALTER TABLE `FriendsList` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `FriendsList`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `FriendsList` (
+  `user_id` int NOT NULL,
+  `friend_id` int NOT NULL,
+  `status` varchar(255) DEFAULT 'Pending',
+  PRIMARY KEY (`user_id`,`friend_id`),
+  KEY `friend_id` (`friend_id`),
+  CONSTRAINT `FriendsList_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`),
+  CONSTRAINT `FriendsList_ibfk_2` FOREIGN KEY (`friend_id`) REFERENCES `Users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `GameHistory`
+-- Table structure for table `GameHistory`
 --
 
-LOCK TABLES `GameHistory` WRITE;
-/*!40000 ALTER TABLE `GameHistory` DISABLE KEYS */;
-/*!40000 ALTER TABLE `GameHistory` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `GameHistory`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `GameHistory` (
+  `user_id` int NOT NULL,
+  `game_id` int NOT NULL,
+  `result` varchar(255) NOT NULL,
+  `role` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`user_id`,`game_id`),
+  KEY `game_id` (`game_id`),
+  CONSTRAINT `GameHistory_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`),
+  CONSTRAINT `GameHistory_ibfk_2` FOREIGN KEY (`game_id`) REFERENCES `Games` (`game_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Games`
+-- Table structure for table `Games`
 --
 
-LOCK TABLES `Games` WRITE;
-/*!40000 ALTER TABLE `Games` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Games` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `Games`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Games` (
+  `game_id` int NOT NULL AUTO_INCREMENT,
+  `ruleset` json NOT NULL,
+  `status` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `seed` int DEFAULT NULL,
+  PRIMARY KEY (`game_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Moves`
+-- Table structure for table `Moves`
 --
 
-LOCK TABLES `Moves` WRITE;
-/*!40000 ALTER TABLE `Moves` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Moves` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `Moves`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Moves` (
+  `move_id` int NOT NULL AUTO_INCREMENT,
+  `game_id` int DEFAULT NULL,
+  `user_id` int DEFAULT NULL,
+  `move_number` int NOT NULL,
+  `move_type` varchar(255) DEFAULT NULL,
+  `move_timestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `card` json DEFAULT NULL,
+  `meld_index` int DEFAULT NULL,
+  PRIMARY KEY (`move_id`),
+  KEY `game_id` (`game_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `Moves_ibfk_1` FOREIGN KEY (`game_id`) REFERENCES `Games` (`game_id`),
+  CONSTRAINT `Moves_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Users`
+-- Table structure for table `Users`
 --
 
-LOCK TABLES `Users` WRITE;
-/*!40000 ALTER TABLE `Users` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Users` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `Users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Users` (
+  `user_id` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(30) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `salt` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -71,4 +122,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-04-03 15:50:49
+-- Dump completed on 2026-04-11 15:23:38

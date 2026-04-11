@@ -4,13 +4,14 @@ Created on Sun Mar  8 15:38:39 2026
 
 @author: Faisal Mustafa
 """
-
+from game_logic.card import Card
 from game_logic.deck import Deck
 from game_logic.ruleset import Ruleset
 from game_logic.hand import Hand
 from game_logic.discard_pile import Discard_pile
 from game_logic.player import Player
 from game_logic.validator import Validator
+from game_logic.utils import Moves
 
 from enum import Enum
 
@@ -96,9 +97,9 @@ class GameState:
             return valid, error
                 
                 
-    def play_stored_melds(self, ruleset, player):
+    def play_stored_melds(self, player):
             
-        success, error_or_stored_melds = Validator.validate_play_melds(player.current_stored_melds, player.has_melded, ruleset, self.current_required_meld_score)
+        success, error_or_stored_melds = Validator.validate_play_melds(player.current_stored_melds, player.has_melded, self.ruleset, self.current_required_meld_score)
         
         if not success:
             return success, error_or_stored_melds
@@ -109,7 +110,7 @@ class GameState:
         
         self.table_melds += player.current_stored_melds
         
-        self.update_required_meld_score(player.return_stored_meld_score(ruleset))
+        self.update_required_meld_score(player.return_stored_meld_score(self.ruleset))
         
         player.completed_stored_melds += player.current_stored_melds
         
@@ -167,4 +168,46 @@ class GameState:
     
     def return_winner(self):
         return self.winner
-            
+    
+    def get_player_by_id(self, player_id):
+        for player in self.players:
+            if player.player_id == player_id:
+                return player
+        return None
+    
+    def _get_card_from_json(self, card_json):
+        return Card.from_dict(card_json, self.ruleset)
+    
+    def apply_move(self, move):
+        move_type = Moves[move["move_type"]]
+        player = self.get_player_by_id(move["user_id"])
+        
+        if move_type == Moves.Draw_Deck:
+            return self.draw_from_deck(player)
+        
+        elif move_type == Moves.Draw_Discard:
+            return self.draw_from_discard_pile(player)
+        
+        elif move_type == Moves.Discard:
+            card = self._get_card_from_json(move["card"])
+            result = self.discard(player, card)
+            if result[0]:
+                self.check_win_condition(player)
+            return result
+        
+        elif move_type == Moves.Meld:
+            cards = [self._get_card_from_json(card) for card in move["cards"]]
+            player.store_meld(cards, self.ruleset)
+            return self.play_stored_melds(player)
+        
+        elif move_type == Moves.Lay_Off:
+            card = self._get_card_from_json(move["card"])
+            meld = self.table_melds[move["meld_index"]]
+            return self.lay_off(player, card, meld)
+        
+        elif move_type == Moves.Deck_Shuffle:
+            self.deck.shuffle()
+            return True, None
+        
+        else:
+            return False, "Unknown Move"

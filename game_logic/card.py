@@ -44,10 +44,10 @@ class Card:
             }
     
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data, ruleset):
         rank = data['rank']
         suit = Suit[data['suit']]
-        return cls(rank, suit)
+        return cls(rank, suit, ruleset)
     
     def to_json_file(self, filename):
         with open(filename, 'w') as file:

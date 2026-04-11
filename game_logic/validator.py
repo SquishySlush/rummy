@@ -5,24 +5,7 @@ Created on Wed Feb 18 11:33:37 2026
 @author: Faisal
 """
 
-from game_logic.utils import quicksort, split_wilds_non_wilds
-from enum import Enum
-
-class Moves(Enum):
-    
-    #Creates an immutable enum for the available moves, along with their notation
-    
-    Draw_Deck = "Draw From Deck"
-    Draw_Discard = "Draw From Discard Pile"
-    Discard = "Discard Card"
-    Meld = "Meld Cards"
-    Lay_Off = "Lay Off Card"    
-    Deck_Shuffle = "Shuffles the Deck"
-    
-class MeldTypes(Enum):
-    
-    RUN = "run"
-    SET = "set"
+from game_logic.utils import quicksort, split_wilds_non_wilds,  MeldTypes
 
 class Validator:
     

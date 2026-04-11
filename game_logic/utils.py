@@ -84,3 +84,19 @@ class Suit(Enum):
     Clubs = 1
     Diamonds = 2
     Spades = 3
+    
+class Moves(Enum):
+    
+    #Creates an immutable enum for the available moves, along with their notation
+    
+    Draw_Deck = "Draw_Deck"
+    Draw_Discard = "Draw_Discard"
+    Discard = "Discard"
+    Meld = "Meld"
+    Lay_Off = "Lay_Off"    
+    Deck_Shuffle = "Deck_Shuffle"
+    
+class MeldTypes(Enum):
+    
+    RUN = "run"
+    SET = "set"
