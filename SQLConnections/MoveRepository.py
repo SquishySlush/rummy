@@ -10,8 +10,13 @@ import json
 class MoveRepository:
     
     @staticmethod
-    def add_move(db, game_id, user_id, move_number, move_type, card=None, meld_index=None):
-        card_string = json.dumps(card.to_dict()) if card is not None else None
+    def add_move(db, game_id, user_id, move_number, move_type, card=None, cards=None, meld_index=None):
+        if cards is not None:
+            card_string = json.dumps(c.to_dict() for c in cards)
+        elif card is not None:
+            card_string = json.dumps(card.to_dict())
+        else:
+            card_string = None
         
         db.execute("INSERT INTO Moves (game_id, user_id, move_number, move_type, card, meld_index) VALUES (%s, %s, %s, %s, %s, %s)",
                    (game_id, user_id, move_number, move_type, card_string, meld_index))
@@ -50,9 +55,17 @@ class MoveRepository:
         return rows, None
     
     @staticmethod
+    def delete_all_moves_by_user(db, user_id):
+        
+        db.execute("DELETE FROM Moves WHERE user_id = %s",
+                   (user_id,))
+        db.commit()
+        
+    
+    @staticmethod
     def get_move_count(db, game_id):
-        result = db.execute("SELECT COUNT(*) FROM Moves WHERE game_id = %s",
+        result = db.execute("SELECT COUNT(*) AS count FROM Moves WHERE game_id = %s",
                    (game_id,))
         
         count = result.fetchone()
-        return count[0], None
+        return count["count"], None

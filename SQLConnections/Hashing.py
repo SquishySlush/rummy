@@ -22,10 +22,14 @@ def simple_hash(input_str, salt):
     
     return hash_vector
 
-def hash_password(password):
-    salt = os.urandom(8).hex()
-    hash_value = simple_hash(password, salt)
-    
+def hash_password(password, salt=None):
+    if salt is not None:
+        hash_value = simple_hash(password, salt)
+    else:
+        salt = os.urandom(8).hex()
+        hash_value = simple_hash(hash_value, salt)
+        
+
     for h in range(1000):
         hash_value = simple_hash(str(hash_value), salt)
         

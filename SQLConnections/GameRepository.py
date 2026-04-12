@@ -28,6 +28,17 @@ class GameRepository:
         return True, None
     
     @staticmethod
+    def get_status(db, game_id):
+        result = db.execute("SELECT status FROM Games WHERE game_id = %s",
+                            (game_id))
+        
+        row = result.fetchone()
+        
+        if row is None:
+            return None, "Game Not Found"
+        return row
+    
+    @staticmethod
     def get_game(db, game_id):
         result = db.execute("SELECT * FROM Games WHERE game_id = %s",
                             (game_id,))
@@ -45,7 +56,7 @@ class GameRepository:
         ruleset = result.fetchone()
         if ruleset is None:
             return None, "Game Not Found"
-        return json.loads(ruleset[0]), None
+        return json.loads(ruleset["ruleset"]), None
 
     @staticmethod
     def delete_game(db, game_id):
@@ -68,9 +79,9 @@ class GameRepository:
     @staticmethod
     def get_seed(db, game_id):
         result = db.execute("SELECT seed FROM Games WHERE game_id = %s",
-                            (game_id))
+                            (game_id,))
         
         seed = result.fetchone()
         if seed is None:
             return None, "Game Does Not Exist"
-        return seed, None
+        return seed["seed"], None

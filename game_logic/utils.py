@@ -14,7 +14,7 @@ def quicksort(items):
     if len(items) <= 1:
         return items
     
-    pivot = items.pop
+    pivot = items.pop()
     items_greater = []
     items_lesser = []
     
@@ -24,7 +24,7 @@ def quicksort(items):
         else:
             items_lesser.append(item)
     
-    return quicksort(items_lesser) + pivot + quicksort(items_greater)
+    return quicksort(items_lesser) + [pivot] + quicksort(items_greater)
 
 
 def split_wilds_non_wilds(cards, ruleset):
@@ -100,3 +100,4 @@ class MeldTypes(Enum):
     
     RUN = "run"
     SET = "set"
+    

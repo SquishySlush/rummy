@@ -55,12 +55,12 @@ class UserRepository:
     
     @staticmethod
     def change_password(db, user_id, password, new_password):
-        result, error = UserRepository.verify_password(password, user_id)
+        result, error = UserRepository.verify_password(db, password, user_id)
         
         if result:
-            hashword = hash_password(new_password)
-            db.execute("UPDATE Users SET password = %s WHERE user_id = %s",
-                       (hashword, user_id))
+            salt, hashword = hash_password(new_password)
+            db.execute("UPDATE Users SET password = %s, salt = %s WHERE user_id = %s",
+                       (hashword, salt, user_id))
             db.commit()
             return result, None
         else:
@@ -85,15 +85,16 @@ class UserRepository:
     
     @staticmethod
     def verify_password(db, password, user_id):
-        result = db.execute("SELECT password FROM Users WHERE user_id = %s",
+        result = db.execute("SELECT password, salt FROM Users WHERE user_id = %s",
                               (user_id,))
+        
         
         row = result.fetchone()
         
         if row is None:
             return False, "User Not Found"
         
-        if hash_password(password) == row[0]:
+        if hash_password(password, row["salt"]) == row["password"]:
             return True, None
         
         return False, "Password incorrect"

@@ -34,6 +34,14 @@ class LinkRepository:
             return None, "No Game History Found"
         return rows, None
     
+    
+    @staticmethod
+    def delete_all_game_history_by_user(db, user_id):
+        
+        db.execute("DELETE FROM GameHistory WHERE user_id = %s",
+                   (user_id,))
+        db.commit()
+    
     @staticmethod
     def update_game_history(db, user_id, game_id, result):
         db.execute("UPDATE GameHistory SET result = %s WHERE user_id = %s AND game_id = %s",
@@ -68,7 +76,7 @@ class LinkRepository:
         return rows, None
     
     @staticmethod
-    def get_pending_requests(db, user_id, status):
+    def get_friends_by_status(db, user_id, status):
         result = db.execute("SELECT * FROM FriendsList WHERE user_id = %s AND status = %s",
                             (user_id, status))
         
@@ -84,3 +92,9 @@ class LinkRepository:
         db.commit()
         
         return True, None
+    
+    @staticmethod
+    def delete_friends_by_user(db, user_id):
+        db.execute("DELETE FROM FriendsList WHERE user_id = %s",
+                   (user_id,))
+        db.commit()

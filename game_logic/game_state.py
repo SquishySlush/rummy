@@ -4,14 +4,12 @@ Created on Sun Mar  8 15:38:39 2026
 
 @author: Faisal Mustafa
 """
-from game_logic.card import Card
-from game_logic.deck import Deck
-from game_logic.ruleset import Ruleset
-from game_logic.hand import Hand
-from game_logic.discard_pile import Discard_pile
-from game_logic.player import Player
-from game_logic.validator import Validator
-from game_logic.utils import Moves
+from card import Card
+from deck import Deck
+from ruleset import Ruleset
+from discard_pile import Discard_pile
+from validator import Validator
+from utils import Moves, quicksort
 
 from enum import Enum
 
@@ -19,23 +17,22 @@ class GameStatus(Enum):
     LOBBY = "Lobby"
     IN_PROGRESS = "In Progress"
     GAME_OVER = "Game Over"
+    PAUSED = "Paused"
 
 class GameState:
-    def __init__(self, player_ids, player_names, ruleset=None):
+    def __init__(self, player, ruleset=None, seed=None):
         
         self.ruleset = ruleset or Ruleset()
         self.game_state = GameStatus.LOBBY
         
-        self.players = [] #list of player objects
-        for i, p_id in enumerate((player_ids)):
-            player = Player(p_id, player_names[i], Hand())
-            self.players.append(player)
+        self.players = [player] #list of player objects, initally just the user who makes the lobby
         
         self.deck = None
         self.discard_pile = None
         self.table_melds = []
         self.winner = None
         self.current_required_meld_score = self.ruleset.min_initial_meld_score
+        self.seed = seed or None
         
         self.current_player_index = 0
     
@@ -45,7 +42,12 @@ class GameState:
         
         self.ruleset = new_ruleset
         return True, "Rules Updated"
-        
+    
+    def add_player(self, new_player):
+        if self.game_state == GameStatus.LOBBY:
+            self.players.append(new_player)
+        return "Game Has Begun"
+    
     def start_game(self):
         if self.game_state != GameStatus.LOBBY:
             return False, "Game Already Started"
@@ -53,7 +55,7 @@ class GameState:
         self.game_state = GameStatus.IN_PROGRESS
         
         #Shuffles the deck
-        self.deck = Deck(self.ruleset)
+        self.deck = Deck(self.ruleset, self.seed)
         self.deck.shuffle()
         
         self.discard_pile = Discard_pile()
@@ -66,6 +68,9 @@ class GameState:
         self.discard_pile.add_card(self.deck.draw())
         
         return True, "Game Started"
+    
+    def pause_game(self):
+        self.game_state = GameStatus.PAUSED
     
     def return_current_player(self):
         return self.players[self.current_player_index]
@@ -145,19 +150,34 @@ class GameState:
             if self.current_required_meld_score < score:
                 self.current_required_meld_score = score
     
-    def _game_end(self, winning_player):
+    def game_end(self, winning_player):
+        
+        deadwoods = []
         for player in self.players:
             if player != winning_player:
                 deadwood = player.hand.calculate_deadwood(self.ruleset)
                 player.add_to_score(self.ruleset, -deadwood)
-            self.ruleset.winner_deadwood
-            winning_player.add_to_score(self.ruleset, deadwood)
+                deadwoods.append(player, deadwood)
+                
+        winning_player.add_to_score(self.ruleset, self.ruleset.winner_deadwood)
+        deadwoods.append(winning_player, self.ruleset.winner_deadwood)
+        
+        if self.ruleset.scoring_method == 'negative':
+            deadwoods = quicksort(deadwoods, key=lambda x: x[1])
+        else:
+            deadwoods = quicksort(deadwoods, key=lambda x: x[1], reverse=True)
+        
+        placement_results = {}
+        
+        for place, (player, score) in enumerate(deadwoods):
+            placement_results[place + 1] = (player, score)
+        
+        
     
     def check_win_condition(self, player):
         if player.hand.is_empty():
             self.game_state = GameStatus.GAME_OVER
             self.winner = player
-            self._game_end(self.winner)
             return self.winner
         else:
             return None

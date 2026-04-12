@@ -25,11 +25,8 @@ class Ruleset:
             config, 
             'allow_runs', 
             True, 
-            bool)
-        
+            bool)      
         #Meld size limitations.
-
-        
         self.max_meld_size_run = self._get_validated(
             config, 
             'max_meld_size_run', 
@@ -53,14 +50,12 @@ class Ruleset:
             'initial_meld_increment', 
             False, 
             bool)
-                    
         #What wild cards exist? Created as a list, and any card that is in both this list and the dictionary should be removed from the dictionary. Wild cards can have  suits or ranks, but it doesnt matter.
         self.wilds = self._get_validated(
             config, 
             'wilds', 
             [("Joker", 0)], 
             list)
-        
         
         self.wild_deadwood_score = self._get_validated(
             config, 
@@ -70,16 +65,13 @@ class Ruleset:
             None,
             0,
             None)
-        
-        
         #Scoring method. Negative scoring gives to winner negative points, and the loser gets points based off of the cards in their hands
         self.scoring_method = self._get_validated(
             config, 
             'scoring_method', 
             'negative', 
             str,
-            ['negative', 'positve'])
-        
+            ['negative', 'positve'])       
         #Ace settings, for ace low, high,, both, and wrap around. Wrap around aces can go King, Ace, 2.
         self.ace_low = self._get_validated(
             config, 
@@ -111,8 +103,7 @@ class Ruleset:
             10, 
             int, 
             None, 
-            1)
-        
+            1)     
         
         self.initial_hand_size = self._get_validated(
             config, 
@@ -166,7 +157,6 @@ class Ruleset:
             True, 
             bool)
         
-    
         self.allow_wild_only_melds = self._get_validated(
             config, 
             'allow_wild_only_melds',

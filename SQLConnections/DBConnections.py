@@ -15,7 +15,7 @@ class dbconnection:
             password = 'pass123',
             database = 'house_rummy')
         
-        self.cursor = self.connection.cursor()
+        self.cursor = self.connection.cursor(dictionary=True)
     
     def execute(self, query, params=None):
         self.cursor.execute(query, params or ())
