@@ -7,7 +7,7 @@ def social_routes(game_service):
 
     @social_blueprint.route("/friends", methods = ["GET"])
     @registered_only
-    def get_friends()
+    def get_friends():
         success, data = game_service.get_friends(session["user_id"])
         if success:
             return jsonify({"friends": data}), 200

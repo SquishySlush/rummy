@@ -30,7 +30,7 @@ def game_events(socketio, game_service):
         emit_game_state()
         
     @socketio.on("resume_game")
-    def resume_gaon_resume()
+    def on_resume_game():
         success, message = game_service.resume_game(session["game_id"])
         if success:
             emit("message", {"message" : message})

@@ -19,7 +19,7 @@ from social_events import social_events
 
 def create_app():
     app = Flask(__name__)
-    app.config.secret_key = "SecretKey@SoSecret"
+    app.secret_key = "SecretKey@SoSecret"
 
     socketio = SocketIO(app, cors_allowed_origins="*")
 
