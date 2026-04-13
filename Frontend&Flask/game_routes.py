@@ -73,7 +73,3 @@ def game_routes(game_service):
         
         session["game_id"] = data["game_id"]
         return jsonify({"message" : "Joined Paused Game"}), 200
-    
-    @game_blueprint.route("/rejoin_game", methods = ["POST"])
-    @in_game
-        

@@ -42,5 +42,3 @@ def game_events(socketio, game_service):
     def emit_game_state():
         state = game_service.get_game_state(session["game_id"], session["user_id"])
         emit ("game_state", {"success" : True, "state" : state}, to=session["game_id"], include_self= True)
-        
-        
