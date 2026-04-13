@@ -9,7 +9,7 @@ from SQLConnections.Hashing import hash_password
 class UserRepository:
     
     @staticmethod
-    def create_user(db, username, password, email):
+    def create_user(db, username, password, email, guest=False):
         
         if UserRepository._username_exists(db, username):
             return False, "Username Exists"
@@ -17,11 +17,13 @@ class UserRepository:
         salt, hashword = hash_password(password)
         
         db.execute(
-            "INSERT INTO Users(username, password, email, salt) VALUES (%s, %s, %s, %s)",
-            (username, hashword, email, salt))
+            "INSERT INTO Users(username, password, email, salt, guest) VALUES (%s, %s, %s, %s, %s)",
+            (username, hashword, email, salt, guest))
         db.commit()
         
-        return True, "User Created"
+        user, _ = UserRepository.get_user_by_username(db, username)
+
+        return True, user
     
     @staticmethod
     def _username_exists(db, username):
@@ -49,7 +51,7 @@ class UserRepository:
         
         row = result.fetchone()
         if row is None:
-            return False, "User Not Found"
+            return None, "User Not Found"
         else:
             return row, None
     

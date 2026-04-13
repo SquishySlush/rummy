@@ -41,7 +41,7 @@ class DatabaseService:
         
         if hashed_password == stored_hash:
             return user, None
-        return False, "Incorrect Password" #Verfies correct password
+        return None, "Incorrect Password" #Verfies correct password
     
     def get_user_by_id(self, user_id):
         return UserRepository.get_user_by_id(self.db, user_id)

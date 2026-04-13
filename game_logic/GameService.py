@@ -6,14 +6,19 @@ Created on Sat Apr 11 19:14:42 2026
 """
 
 from game_state import GameState, GameStatus
-
+from player import Player
+from hand import Hand
 
 class GameService:
     def __init__(self, db_service):
         self.active_games = {}
+        self.active_players = {}
         self.db = db_service
     
-    def create_game(self, player, ruleset, seed):
+    def create_game(self, user_id, ruleset, seed):
+        player, error = self.get_active_player(user_id)
+        if player is None:
+            return False, error
         success, game_id = self.db.create_game(ruleset, seed)
         if not success:
             return False, "could Not Create Game"
@@ -21,7 +26,10 @@ class GameService:
         self.active_games[game_id] = game
         return game_id, None
     
-    def add_player(self, new_player, game_id):
+    def add_player(self, game_id):
+        new_player, error = self.get_active_player(user_id)
+        if new_player is None:
+            return False, error
         game = self.active_games[game_id]
         if game.game_state != "Lobby":
             return False, "Game Not Available"
@@ -45,7 +53,10 @@ class GameService:
         game.pause_game(game_id)
         del self.active_games[game_id]
     
-    def load_paused_game(self, game_id, player):
+    def load_paused_game(self, game_id, user_id):
+        player, error = self.get_active_player(user_id)
+        if player is None:
+            return False, error
         
         row, error = self.db.get_game_status(game_id)
         
@@ -68,7 +79,11 @@ class GameService:
         self.active_games[game_id] = game
         return True, "Game Loaded"
     
-    def rejoin_game(self, game_id, player):
+    def rejoin_game(self, game_id, user_id):
+        player, error = self.get_active_player(user_id)
+        if player is None:
+            return False, error
+        
         history, error = self.db.get_player_history(player.player_id)
         if not history:
             return False, error
@@ -134,7 +149,11 @@ class GameService:
         del self.active_games[game_id]
         return True, results
         
-    def get_game_state(self, game_id, player):
+    def get_game_state(self, game_id, user_id):
+
+        player, error = self.get_active_player(user_id)
+        if player is None:
+            return False, error
         
         game = self.active_games[game_id]
         
@@ -182,6 +201,22 @@ class GameService:
         
         return state
     
+    def get_active_player(self, user_id):
+        player = self.active_players.get(user_id)
+        if player is None:
+            return None, "Player Not Found"
+        return player, None
+
+    def create_guest(self):
+        success = False
+        while not success:
+            success, user = self.db.sign_up(f"Guest_{user_id}, None, None, True")
+        hand = Hand()
+        player = Player(user["user_id"], user["username"], hand)
+        self.acive_players[user["user_id"]] = player
+        return True
+
+
     def get_lobbies(self):
         return self.db.get_lobbies()
     
@@ -192,8 +227,25 @@ class GameService:
         return self.db.sign_up(username, password, email)
     
     def log_in(self, username, password):
-        return self.db.log_in(username, password)
-    
+        user, error = self.db.log_in(username, password)
+        if user:
+            hand = Hand()
+            player = Player(user["user_id"], username, hand)
+            self.active_players[user["user_id"]] = player
+            return user, None
+        return False, error
+
+    def log_out(self, user_id, is_guest):
+        user, _ = self.db.get_user_by_id(self.db, user_id)
+
+        if user is None:
+            return False, "No User To Log Out"
+        if is_guest:
+            self.db.delete_user()
+        if user_id in self.active_players:
+            del self.active_players[user_id]
+        return True, "Logged Out"
+
     def delete_account(self, user_id):
         return self.db.delete_user(user_id)
     
