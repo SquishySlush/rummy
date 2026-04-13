@@ -21,8 +21,8 @@ class LinkRepository:
         
         rows = result.fetchall()
         if rows == []:
-            return None, "No Game History Found"
-        return rows, None
+            return False, "No Game History Found"
+        return True, rows
     
     @staticmethod
     def get_game_history_by_game(db, game_id):
@@ -58,12 +58,24 @@ class LinkRepository:
         db.commit()
     
     @staticmethod
-    def update_friend_status(db, user_id, friend_id, status):
-        db.execute("UPDATE FriendsList SET status = %s WHERE user_id = %s AND friend_id = %s",
-                   (status, user_id, friend_id))
+    def update_friend_status(db, sender_id, receiver_id, status):
+        result = db.execute(
+        """UPDATE FriendsList SET status = %s 
+        WHERE user_id = %s AND friend_id = %s AND status = 'Pending'""",
+        (status, sender_id, receiver_id))
+    
+        if result.rowcount == 0:
+            return False, "Request Not Found Or Not Authorised"
+    
+        db.execute(
+            """INSERT INTO FriendsList (user_id, friend_id, status)
+            VALUES (%s, %s, %s)""",
+            (receiver_id, sender_id, status))
+
         db.commit()
         
         return True, None
+
     
     @staticmethod
     def get_friends(db, user_id):
@@ -72,8 +84,8 @@ class LinkRepository:
         
         rows = result.fetchall()
         if rows == []:
-            return None, "No Friends Found"
-        return rows, None
+            return False, "No Friends Found"
+        return True, rows
     
     @staticmethod
     def get_friends_by_status(db, user_id, status):
@@ -82,8 +94,8 @@ class LinkRepository:
         
         rows = result.fetchall()
         if rows == []:
-            return None, "No Friends Found"
-        return rows, None
+            return False, "No Friends Found"
+        return True, rows
     
     @staticmethod
     def delete_friend(db, user_id, friend_id):

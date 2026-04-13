@@ -70,8 +70,8 @@ class DatabaseService:
         LinkRepository.create_friends_list(self.db, user_id, friend_id)
         return True, None
     
-    def accept_friend_request(self, user_id, friend_id):
-        return LinkRepository.update_friend_status(self.db, user_id, friend_id, "Accepted")
+    def accept_friend_request(self, sender_id, reciever_id):
+        LinkRepository.update_friend_status(self.db, sender_id, reciever_id, "Accepted")
     
     def reject_friend_request(self, user_id, friend_id):
         return LinkRepository.delete_friend(self.db, user_id, friend_id)

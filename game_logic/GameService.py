@@ -5,9 +5,11 @@ Created on Sat Apr 11 19:14:42 2026
 @author: Faisal Mustafa
 """
 
+import uuid
 from game_state import GameState, GameStatus
 from player import Player
 from hand import Hand
+
 
 class GameService:
     def __init__(self, db_service):
@@ -15,9 +17,11 @@ class GameService:
         self.active_players = {}
         self.db = db_service
     
-    def create_game(self, user_id, ruleset, seed):
+    def create_game(self, user_id, ruleset, seed=None):
         player, error = self.get_active_player(user_id)
         if player is None:
+            return False, error
+        if self.get_player_current_game(user_id):
             return False, error
         success, game_id = self.db.create_game(ruleset, seed)
         if not success:
@@ -26,15 +30,16 @@ class GameService:
         self.active_games[game_id] = game
         return game_id, None
     
-    def add_player(self, game_id):
+    def add_player(self, game_id, user_id):
         new_player, error = self.get_active_player(user_id)
         if new_player is None:
             return False, error
         game = self.active_games[game_id]
-        if game.game_state != "Lobby":
+        if game.game_state != GameStatus.LOBBY:
             return False, "Game Not Available"
-            
-        return True, game.add_player(new_player)
+        
+        game.add_player(new_player)
+        return True, game_id
         
     def start_game(self, game_id):
         game = self.active_games[game_id]
@@ -44,13 +49,14 @@ class GameService:
         for player in game.players:
             self.db.add_player_to_game(player.user_id, game_id, "Player")
         
-        return game.start_game()
+        game.start_game()
+        return game.game_status.name
     
     def pause_game(self, game_id):
         game = self.active_games[game_id]
         
-        self.db.pause_game()
-        game.pause_game(game_id)
+        self.db.pause_game(game_id)
+        game.pause_game()
         del self.active_games[game_id]
     
     def load_paused_game(self, game_id, user_id):
@@ -93,7 +99,7 @@ class GameService:
         if game_id not in game_ids:
             return False, "Player Doesn't Belong to This Game"
 
-        return self.add_player(player, game_id)
+        self.add_player(game_id, user_id)
     
     def resume_game(self, game_id):
         game = self.active_games[game_id]
@@ -110,27 +116,14 @@ class GameService:
     
     def apply_move(self, 
                    game_id, 
-                   user_id, 
-                   move_type, 
-                   card=None, 
-                   cards=None, 
-                   meld_index=None):
+                   move):
         
         
-        game = self.active_games[game_id]
-        
-        move = {
-            "move_type" : move_type,
-            "user_id" : user_id,
-            "card" : card,
-            "cards" : cards,
-            "meld_index" : meld_index
-            }
-        
+        game = self.active_games[game_id]        
         success, error = game.apply_move(move)
         
         if success:
-            self.db.add_move(game_id, user_id, move['move_type'], card, cards, meld_index)
+            self.db.add_move(game_id, move["user_id"], move['move_type'], move["card"], move["cards"], move["meld_index"])
             if game.return_game_state() == GameStatus.GAME_OVER:
                 self.end_game(game_id)
                 
@@ -208,13 +201,15 @@ class GameService:
         return player, None
 
     def create_guest(self):
-        success = False
-        while not success:
-            success, user = self.db.sign_up(f"Guest_{user_id}, None, None, True")
+        username = f"Guest_{uuid.uuid4().hex[:8]}"
+        success, user = self.db.sign_up("username", None, None, True)
+        if not success:
+            return False, "Could Not Create Guest"
+        
         hand = Hand()
-        player = Player(user["user_id"], user["username"], hand)
+        player = Player(user["user_id"], username, hand)
         self.acive_players[user["user_id"]] = player
-        return True
+        return True, user
 
 
     def get_lobbies(self):
