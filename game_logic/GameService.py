@@ -6,9 +6,9 @@ Created on Sat Apr 11 19:14:42 2026
 """
 
 import uuid
-from game_state import GameState, GameStatus
-from player import Player
-from hand import Hand
+from game_logic.game_state import GameState, GameStatus
+from game_logic.player import Player
+from game_logic.hand import Hand
 
 
 class GameService:

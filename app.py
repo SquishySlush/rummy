@@ -5,17 +5,17 @@ Created on Sat Apr 11 19:14:09 2026
 @author: Faisal Mustafa
 """
 
-from flask import Flask
+from flask import Flask, render_template
 from flask_socketio import SocketIO
 from game_logic.GameService import GameService
 from SQLConnections.DatabaseService import DatabaseService
 
-from auth_routes import auth_blueprint, auth_routes
-from game_routes import game_blueprint, game_routes
-from social_routes import social_blueprint, social_routes
+from FrontEnd.auth_routes import auth_blueprint, auth_routes
+from FrontEnd.game_routes import game_blueprint, game_routes
+from FrontEnd.social_routes import social_blueprint, social_routes
 
-from game_events import game_events
-from social_events import social_events
+from FrontEnd.game_events import game_events
+from FrontEnd.social_events import social_events
 
 def create_app():
     app = Flask(__name__)
@@ -36,6 +36,14 @@ def create_app():
 
     game_events(socketio, game_service)
     social_events(socketio, game_service)
+
+    @app.route("/")
+    def home_page():
+        return render_template("MainMenu.html")
+
+    @app.route("/SignUp")
+    def signup_page():
+        return render_template("SignUp.html")
 
     return app, socketio
 

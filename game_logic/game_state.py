@@ -4,12 +4,12 @@ Created on Sun Mar  8 15:38:39 2026
 
 @author: Faisal Mustafa
 """
-from card import Card
-from deck import Deck
-from ruleset import Ruleset
-from discard_pile import Discard_pile
-from validator import Validator
-from utils import Moves, quicksort
+from game_logic.card import Card
+from game_logic.deck import Deck
+from game_logic.ruleset import Ruleset
+from game_logic.discard_pile import Discard_pile
+from game_logic.validator import Validator
+from game_logic.utils import Moves, quicksort
 
 from enum import Enum
 

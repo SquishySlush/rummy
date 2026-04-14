@@ -2,29 +2,28 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content=""width=device-width, initial-scale="0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Main Menu</title>
-        <link rel="stylesheet" href="E:\A levels\Comp Sci\NEA\Rummy\FrontEnd\Static\Styles.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='Styles.css') }}">
     </head>
     <body>
-
-        <div class="page">
             <div class="top-bar">
-                <button class="top-button">Sign Up</button>
-                <button class="top-button">Login</button>
+                <a href="/SignUp">
+                <button class="button small-button">Sign Up</button>
+                </a>
+                <button class="button small-button">Login</button>
             </div>
 
             <div class="main-content">
-                <div class="logo"></div>
-
-                <div class="menu-buttons">
-                    <button class="menu-button">Create Lobby</button>
-                    <button class="menu-button">Friends List</button>
-                </div>
+                <a href="/">
+                <img class = "logo" src="" alt="">
+                </a>
+                <button class="button menu-button">Create Lobby</button>
+                <button class="button menu-button">Friends List</button>
             </div>
 
             <div class="bottom-bar">
-            <button class="ruleset-button">Custom Rulesets</button>
+            <button class="button small-button">Custom Rulesets</button>
             </div>
         </div>
     </body>

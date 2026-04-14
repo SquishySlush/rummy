@@ -5,7 +5,8 @@ Created on Fri Apr 10 15:09:13 2026
 @author: Faisal Mustafa
 """
 
-import mysql.connector
+import mysql
+
 
 class dbconnection:
     def __init__(self):

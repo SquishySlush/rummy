@@ -1,7 +1,7 @@
 
 from flask import Blueprint, request, jsonify, session
-from auth_decorators import registered_only
-from game_decorators import in_game, not_in_game
+from FrontEnd.auth_decorators import registered_only
+from FrontEnd.game_decorators import in_game, not_in_game
 
 game_blueprint = Blueprint("game", __name__)
 

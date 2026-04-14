@@ -5,11 +5,11 @@ Created on Sat Apr 11 15:32:38 2026
 @author: Faisal Mustafa
 """
 
-from DBConnections import dbconnection
-from UserRepository import UserRepository
-from GameRepository import GameRepository
-from MoveRepository import MoveRepository
-from LinkRepository import LinkRepository
+from SQLConnections.DBConnections import dbconnection
+from SQLConnections.UserRepository import UserRepository
+from SQLConnections.GameRepository import GameRepository
+from SQLConnections.MoveRepository import MoveRepository
+from SQLConnections.LinkRepository import LinkRepository
 from Hashing import hash_password
 
 class DatabaseService:

@@ -1,7 +1,7 @@
 
 
 from flask import Blueprint, request, jsonify, session
-from auth_decorators import registered_only
+from FrontEnd.auth_decorators import registered_only
 
 auth_blueprint = Blueprint("auth", __name__)
 
