@@ -187,6 +187,13 @@ class Ruleset:
             25, 
             int)        
         
+        self.max_players = self._get_validated(
+            config,
+            'max_players',
+            4,
+            int
+        )
+
     def _get_validated(
             self, 
             config, 

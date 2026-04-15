@@ -1,0 +1,37 @@
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Main Menu</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='Styles.css') }}">
+    </head>
+    <body>
+        <div class="screen-wrapper">
+            <div class="app">
+                <div class="top-bar">
+                    <a href="/SignUp">
+                        <button class="box button small-button">Sign Up</button>
+                    </a>
+                    <a href="/Login">
+                        <button class="box button small-button">Login</button>
+                    </a>
+                </div>
+
+                <div class="main-content">
+                    <a href="/">
+                    <img class = "logo" src="{{ url_for('static', filename='textures/logo.png') }}" alt="LOGO">
+                    </a>
+                    <button class="box button menu-button">Create Lobby</button>
+                    <button class="box button menu-button">Friends List</button>
+                </div>
+
+                <div class="bottom-bar">
+                    <a href="/CustomRuleset">
+                    <button class="box button small-button">Custom Rulesets</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

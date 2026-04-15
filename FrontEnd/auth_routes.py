@@ -11,22 +11,30 @@ def auth_routes(game_service):
     def sign_up():
         data = request.get_json()
 
-        success, message = game_service.sign_up(data["username"], data["password"], data["email"])
+        username = data.get("username", "").strip()
+        password = data.get("password", "")
+        email = data.get("email", "").strip()
+
+        if not username or not password or not email:
+            return 
+
+        success, message = game_service.sign_up(username, password, email)
         if success:
-            return jsonify({"message" : message}), 201
+            message, number = _login_user(username, password)
+            return jsonify({"message" : message}), number
+        
         return jsonify({"error" : message}), 400
     
     @auth_blueprint.route("/login", methods = ["POST"])
     def login():
         data = request.get_json()
 
-        user, error = game_service.log_in(data["username"], data["password"])
-        if user:
-            session["user_id"] = user["user_id"]
-            session["username"] = user["username"]
-            return jsonify({"message" : "Logged In"}), 200
-        
-        return jsonify({"error" : error}), 401
+        username = data.get("username", "").strip()
+        password = data.get("password", "")
+
+        message, number = _login_user(username, password)
+
+        return jsonify({"message" : message}), number
     
     @auth_blueprint.route("/log_out", methods = ["POST"])
     def log_out():
@@ -74,3 +82,15 @@ def auth_routes(game_service):
             session.clear()
             return jsonify({"message" : "Account Deleted"}), 200
         return jsonify({"message" : error}), 401
+    
+
+    def _login_user(username, password):
+        user, error = game_service.log_in("username", "password")
+
+        if user:
+            session["user_id"] = user["user_id"]
+            session["username"] = user["username"]
+            session.pop("guest", None)
+            return ("Logged In", 200)
+        return (error, 401)
+        

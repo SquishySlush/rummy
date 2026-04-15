@@ -5,7 +5,7 @@ Created on Fri Apr 10 15:09:13 2026
 @author: Faisal Mustafa
 """
 
-import mysql
+import mysql.connector
 
 
 class dbconnection:

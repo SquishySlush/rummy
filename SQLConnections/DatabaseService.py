@@ -10,7 +10,7 @@ from SQLConnections.UserRepository import UserRepository
 from SQLConnections.GameRepository import GameRepository
 from SQLConnections.MoveRepository import MoveRepository
 from SQLConnections.LinkRepository import LinkRepository
-from Hashing import hash_password
+from SQLConnections.Hashing import hash_password
 
 class DatabaseService:
     

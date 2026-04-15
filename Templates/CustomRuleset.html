@@ -1,0 +1,38 @@
+{% from "components/rule_row.html" import rule_row %}
+
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Rules</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='Styles.css') }}">
+    </head>
+    <body>
+        <div class="screen-wrapper">
+            <div class="app">
+                <div class="top-row">
+                    <div class="top-search">
+                        <input class="box field search" name="Rules" type="text" placeholder="Search:">
+                    </div>
+                    <div class="top-bar">
+                        <a href="/">
+                            <img class = "logo-small" src="{{ url_for('static', filename='textures/logo.png') }}" alt="LOGO">
+                        </a>
+                    </div>
+                </div>
+                    <div class="scroll-list">
+                            {% for rule in rules %}
+                                {{ rule_row(
+                                    rule.label,
+                                    rule.name,
+                                    rule.control_type,
+                                    rule.value | default(""),
+                                    rule.checked | default(False)
+                                ) }}
+                            {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>

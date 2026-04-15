@@ -45,8 +45,11 @@ class GameState:
     
     def add_player(self, new_player):
         if self.game_state == GameStatus.LOBBY:
-            self.players.append(new_player)
-        return "Game Has Begun"
+            if len(self.players) < self.ruleset.max_players:
+                self.players.append(new_player)
+            else:
+                return "Game Has Begun"
+
     
     def start_game(self):
         if self.game_state != GameStatus.LOBBY:
