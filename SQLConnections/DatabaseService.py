@@ -76,11 +76,49 @@ class DatabaseService:
     def reject_friend_request(self, user_id, friend_id):
         return LinkRepository.delete_friend(self.db, user_id, friend_id)
     
+    def get_all_users_except(self, user_id):
+        return UserRepository.get_all_users_except(user_id)
+    
     def get_friends(self, user_id):
-        return LinkRepository.get_friends_by_status(self.db, user_id, "Accepted")
+        success, rows = LinkRepository.get_friends_by_status(self.db, user_id, "Accepted")
+
+        if not success:
+            return False, rows
+        
+        friends = []
+
+        for row in rows:
+            user, error = UserRepository.get_user_by_id(self.db, row["friend_id"])
+            if user is not None:
+                friends.append(user)
+            
+            if friends == []:
+                return False, "No Firends Found"
+            return True, friends
     
     def get_pending_requests(self, user_id):
-        return LinkRepository.get_friends_by_status(self.db, user_id, "Pending")
+        success, rows = LinkRepository.get_friends_by_status(self.db, user_id, "Pending")
+
+        if not success:
+            return False, rows
+        requests = []
+
+        for row in rows:
+            if row["user_id"] == user_id:
+                other_id = row["friend_id"]
+                direction = "outgoing"
+            else:
+                other_id = row["user_id"]
+                direction = "incoming"
+            
+            user, error = UserRepository.get_user_by_id(self.db, other_id)
+
+            if user is not None:
+                requests.append({"user": user, "direction" : direction})
+            
+            if requests == []:
+                return False, "No Pending Requests"
+            return True, requests
     
     def create_game(self, ruleset, seed):
         return GameRepository.create_game(self.db, ruleset, "LOBBY", seed)
@@ -136,7 +174,28 @@ class DatabaseService:
         return LinkRepository.update_game_history(self.db, user_id, game_id, result)
     
     def get_player_history(self, user_id):
-        return LinkRepository.get_game_history_by_player(self.db, user_id)
+        success, rows = LinkRepository.get_game_history_by_player(self.db, user_id)
+        if not success:
+            return False, rows
+        
+        history = []
+
+        for row in rows:
+            user, error = UserRepository.get_user_by_id(self.db, row["user_id"])
+            if user is None:
+                continue
+
+            history.append({
+                "game_id": row["game_id"],
+                "username": user["username"],
+                "result": row["result"],
+                "role": row["role"]
+            })
+        
+        if history == []:
+            return False, "No Game History Found"
+        
+        return True, history
     
     def get_game_players(self, game_id):
         return LinkRepository.get_game_history_by_game(self.db, game_id)
@@ -152,3 +211,6 @@ class DatabaseService:
     
     def get_move_count(self, game_id):
         return MoveRepository.get_move_count(self.db, game_id)
+    
+    def get_user_guest_status(self, user_id):
+        return UserRepository.get_user_guest_status(self.d, user_id)

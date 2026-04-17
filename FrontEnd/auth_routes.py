@@ -1,7 +1,7 @@
 
 
 from flask import Blueprint, request, jsonify, session
-from FrontEnd.auth_decorators import registered_only
+from FrontEnd.auth_decorators import registered_only, user_required
 
 auth_blueprint = Blueprint("auth", __name__)
 
@@ -16,7 +16,7 @@ def auth_routes(game_service):
         email = data.get("email", "").strip()
 
         if not username or not password or not email:
-            return 
+            return jsonify({"error": "Username, password, and email are required"}), 400
 
         success, message = game_service.sign_up(username, password, email)
         if success:
@@ -37,8 +37,12 @@ def auth_routes(game_service):
         return jsonify({"message" : message}), number
     
     @auth_blueprint.route("/log_out", methods = ["POST"])
+    @user_required
     def log_out():
-        game_service.log_out(session["user_id"], session.get("guest"))
+        user_id = session.get("user_id")
+        guest = session.get("guest", None)
+
+        game_service.log_out(user_id, guest)
         session.clear()
         return jsonify({"message" : "Logged Out"}),200
     
@@ -56,8 +60,12 @@ def auth_routes(game_service):
     @registered_only
     def change_password():
         data = request.get_json()
+        user_id = session.get("user_id")
+        old_password = data.get("old_password", None)
+        new_password = data.get("new_password", None)
 
-        result, error = game_service.change_password(session["user_id"], data["old_password"], data["new_password"])
+
+        result, error = game_service.change_password(user_id, old_password, new_password)
         if result:
             return jsonify({"message" : "Changed Password"}), 200
         return jsonify({"message" : error}), 401
@@ -66,8 +74,10 @@ def auth_routes(game_service):
     @registered_only
     def change_username():
         data = request.get_json()
+        user_id = session.get("user_id")
+        new_username = data.get("new_username", None)
 
-        result, error = game_service.change_username(data["user_id"], data["new_username"])
+        result, error = game_service.change_username(user_id, new_username)
 
         if result:
             session["username"] = data["new_username"]
@@ -85,12 +95,13 @@ def auth_routes(game_service):
     
 
     def _login_user(username, password):
-        user, error = game_service.log_in("username", "password")
+        success, user = game_service.log_in(username, password)
 
-        if user:
+        if success:
             session["user_id"] = user["user_id"]
             session["username"] = user["username"]
+            session["guest"] = False
             session.pop("guest", None)
             return ("Logged In", 200)
-        return (error, 401)
+        return (user, 401)
         

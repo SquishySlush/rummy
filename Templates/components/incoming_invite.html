@@ -1,0 +1,24 @@
+{% macro rule_row(label, name, control_type="text", value="") %}
+<div id="invite-received-modal" class="modal-overlay">
+    <div class="modal-content">
+
+        <div class="top-row">
+            <div class="rule-label">Lobby Invite</div>
+        </div>
+
+        <div id="invite-message" class="box field invite-message">
+        
+        </div>
+
+        <div class="invite-actions">
+            <button type="button" class="box button signup-button" id="accept-invite-button">
+                ACCEPT
+            </button>
+            <button type="button" class="box button signup-button" id="decline-invite-button">
+                DECLINE
+            </button>
+        </div>
+
+    </div>
+</div>
+{% endmacro %}

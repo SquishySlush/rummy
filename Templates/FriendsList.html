@@ -1,0 +1,37 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Friends List</title>
+
+        <link rel="stylesheet" href="{{ url_for('static', filename='Styles.css') }}">
+        <script defer src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+        <script defer src="{{ url_for('static', filename='js/FriendsList.js') }}"></script>
+    </head>
+<body>
+    <div class="screen-wrapper">
+        <div class="app">
+
+            <div class="top-row">
+                <div class="top-search">
+                    <input
+                        id="friend-search"
+                        class="box field search"
+                        name="friend-search"
+                        type="text"
+                        placeholder="Search For Players:"
+                    >
+                </div>
+
+                <div class="top-bar">
+                    <a href="/">
+                        <img class="logo-small" src="{{ url_for('static', filename='textures/logo.png') }}" alt="LOGO">
+                    </a>
+                </div>
+            </div>
+            <div class="main-content"></div>
+                <div id="friends-list" class="scroll-list"></div>
+            </div>
+        </div>
+    </div>
+</body>

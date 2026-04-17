@@ -1,0 +1,75 @@
+{% from "components/rule_row_small.html" import rule_row_small %}
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Game Lobby</title>
+
+        <link rel="stylesheet" href="{{ url_for('static', filename='Styles.css') }}">
+        <script defer src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+        <script defer src="{{ url_for('static', filename='js/GameLobby.js') }}"></script>
+    </head>
+<body>
+    <div class="screen-wrapper">
+        <div class="app">
+
+            <div class="top-row">
+                <div class="top-bar">
+                    <a href="/">
+                        <img class="logo-small" src="{{ url_for('static', filename='textures/logo.png') }}" alt="LOGO">
+                    </a>
+                </div>
+            </div>
+
+            <div class="lobby-layout">
+
+                <div class="left-panel">
+                    <div class="box players-panel">
+                        <div id="players-list" class="players-list"></div>
+                    </div>
+                    
+                    <button type="button" class="box button signup-button" id="invite-button">INVITE</button>
+                    <button type="button" class="box button signup-button" id="ready-button">READY!</button>
+                    <a href="/GameState">
+                        <button type="button" class="box button signup-button" id="start-button">START</button>
+                    </a>
+
+                    <div id="invite-modal" class="modal-overlay">
+                        <div class="modal-content">
+                            <div class="top-row">
+                                <div class="rule-label">Invite Friends</div>
+                                <button type="button" class="box button small-button">X</button>
+                            </div>
+
+                            <div id="invite-friends-list" class="scroll-list"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="right-panel">
+                    <div class="scroll-list">
+                        {% for rule in rules %}
+                            {{ rule_row_small(
+                                rule.label,
+                                rule.name,
+                                rule.control_type,
+                                rule.value | default(""),
+                                rule.checked | default(False)
+                            ) }}
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="bottom-bar">
+                <button class="box button signup-button" id="export-button">Export To Json</button>
+                <button class="box button signup-button" id="import-button">Import From Json</button>
+                <button class="box button signup-button" id="save-button">Save</button>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

@@ -93,7 +93,23 @@ def create_app():
     
     @app.route("/CustomRuleset")
     def ruleset():
-        return render_template("CustomRuleset.HTML", rules=RULES)
+        return render_template("CustomRuleset.html", rules=RULES)
+    
+    @app.route("/GameLobby")
+    def gamelobby():
+        return render_template("GameLobby.html", rules=RULES)
+
+    @app.route("/FriendsList")
+    def friendslist():
+        return render_template("FriendsList.html")
+    
+    @app.route("/GameHistory")
+    def gamehistory():
+        return render_template("GameHistory.html")
+
+    @app.route("/GameState")
+    def gamestate():
+        return render_template("GameState.html")
 
     return app, socketio
 

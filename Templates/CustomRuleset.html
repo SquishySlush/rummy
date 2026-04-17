@@ -5,8 +5,11 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Rules</title>
+        <title>CustomRuleset</title>
+
         <link rel="stylesheet" href="{{ url_for('static', filename='Styles.css') }}">
+        <script defer src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+        <script defer src="{{ url_for('static', filename='js/CustomRuleset.js') }}"></script>
     </head>
     <body>
         <div class="screen-wrapper">
@@ -31,6 +34,10 @@
                                     rule.checked | default(False)
                                 ) }}
                             {% endfor %}
+                    </div>
+                    <div class="bottom-bar">
+                        <button class="box button small-button">Import Json</button>
+                        <button class="box button small-button">Export Json</button>
                     </div>
                 </div>
             </div>

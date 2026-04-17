@@ -1,0 +1,41 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>GameState</title>
+
+        <link rel="stylesheet" href="{{ url_for('static', filename='Styles.css') }}">
+        <script defer src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+        <script defer src="{{ url_for('static', filename='js/GameState.js') }}"></script>
+    </head>
+<body>
+    <div class="screen-wrapper">
+        <div class="app">
+            <div class="game-table">
+                <div class="top-bar">
+                    <a href="/">
+                        <img class="logo-small" src="{{ url_for('static', filename='textures/logo.png') }}" alt="LOGO">
+                    </a>
+                </div>
+
+                <div id="opponents-layer" class="opponents-layer"></div>
+
+                <div class="center-piles">
+                    <button type="button" class="card pile-card" id="deck-pile"></button>
+                    <button type="button" class="card pile-card" id="discard-pile"></button>
+                </div>
+
+                <div id="meld-area" class="meld-area"></div>
+
+                <div class="player-hand-wrapper">
+                    <div id="player-hand" class="player-hand"></div>
+                </div>
+
+                <button type="button" class="box button small-button sort-hand-button" id="sort-hand-button">
+                    Sort<br>Hand
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

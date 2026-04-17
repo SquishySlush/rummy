@@ -3,7 +3,10 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Login</title>
+
         <link rel="stylesheet" href="{{ url_for('static', filename='Styles.css') }}">
+        <script defer src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+        <script defer src="{{ url_for('static', filename='js/GameLobby.js') }}"></script>
     </head>
     <body>
         <div class="screen-wrapper">
@@ -12,9 +15,9 @@
                 <a href="/">
                     <img class = "logo" src="{{ url_for('static', filename='textures/logo.png') }}" alt="LOGO">
                 </a>
-                <input class="box field" type="text" placeholder="Username"> 
-                <input class="box field" type="text" placeholder="Password">
-                <button class="box button signup-button">Login</button>
+                <input class="box field" type="text" placeholder="Username" id="username-field"> 
+                <input class="box field" type="password" placeholder="Password" id="password-field">
+                <button class="box button signup-button" id="login-button">Login</button>
                 </div>
             </div>
         </div>

@@ -31,8 +31,8 @@ class LinkRepository:
         
         rows = result.fetchall()
         if rows == []:
-            return None, "No Game History Found"
-        return rows, None
+            return False, "No Game History Found"
+        return True, rows
     
     
     @staticmethod
@@ -97,6 +97,22 @@ class LinkRepository:
             return False, "No Friends Found"
         return True, rows
     
+    @staticmethod
+    def get_pending_requests_for_user(db, user_id):
+        result = db.execute(
+            """
+            SELECT * FROM FriendsList
+            WHERE status = 'Pending'
+            AND (user_id = %s OR friend_id = %s)
+            """,
+            (user_id, user_id)
+        )
+
+        rows = result.fetchall()
+        if rows == []:
+            return False, "No Pending Requests Found"
+        return True, rows
+
     @staticmethod
     def delete_friend(db, user_id, friend_id):
         db.execute("DELETE FROM FriendsList WHERE user_id = %s AND friend_id = %s",

@@ -1,0 +1,20 @@
+{% macro rule_row_small(label, name, control_type="text", value="", checked=False) %}
+<div class="box rule-row rule-row-small">
+    <div class="rule-label">{{ label }}</div>
+    <div class="rule-control">
+        {% if control_type == "switch" %}
+            <label class="switch">
+                <input type="checkbox" name="{{ name }}" {% if checked %}checked{% endif %}>
+                <span class="toggle-track"></span>
+            </label>
+        {% elif control_type == "text" %}
+            <input
+                class="box rule-field"
+                type="text"
+                name="{{ name }}"
+                value="{{ value }}"
+            >
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}

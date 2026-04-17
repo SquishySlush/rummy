@@ -24,15 +24,12 @@ body {
     aspect-ratio: 16 / 9;
     width: min(100vw, calc(100vh * 16 / 9));
     height: min(100vh, calc(100vw * 9 / 16));
-
     background-color: #00212D;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-
     container-type: size;
 
-    /* design space: 1920 x 1080 */
     --sx: calc(100cqw / 1920);
     --sy: calc(100cqh / 1080);
     --s: min(var(--sx), var(--sy));
@@ -57,6 +54,11 @@ body {
 
     width: calc(1860 * var(--sx));
     height: calc(90 * var(--sy));
+}
+
+.rule-row-small {
+    width: calc(1120 * var(--sx));
+    height: calc(70 * var(--sy));
 }
 
 .rule-label {
@@ -143,6 +145,7 @@ body {
 .scroll-list {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     min-height: 0;
     margin: 0 calc(20 * var(--sx)) calc(50 * var(--sy)) calc(20 * var(--sx));
 }
@@ -170,7 +173,10 @@ body {
 .bottom-bar {
     display: flex;
     justify-content: flex-end;
-    align-items: flex-end;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 0 calc(20 * var(--sx)) calc(20 * var(--sy)) calc(20 * var(--sx));
+    box-sizing: border-box;
 }
 
 .main-content {
@@ -225,4 +231,299 @@ body {
 
 .switch input:checked + .toggle-track::before {
     transform: translateY(-50%) translateX(calc(67 * var(--sx)));
+}
+
+.switch input:checked + .toggle-track {
+    background-color: #4388a4; /* ON */
+}
+
+.switch input:not(:checked) + .toggle-track {
+    background-color: #000000; /* OFF (same as your default, optional) */
+}
+
+.lobby-layout {
+    display: flex;
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+    padding: calc(15 * var(--s));
+    gap: calc(10 * var(--sx));
+    overflow: hidden;
+}
+
+.left-panel,
+.right-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.left-panel {
+    width: calc(690 * var(--sx));
+    box-sizing: border-box;
+}
+
+.right-panel {
+    flex: 1;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.players-panel {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.players-list {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    gap: calc(10 * var(--sy));
+}
+
+.friend-row {
+    display: flex;
+    align-items: center;
+    gap: calc(10 * var(--sx))
+}
+
+.player-box {
+    flex: 3;
+    height: calc(90 * var(--sy));
+    flex-shrink: 0;
+}
+
+.friend-status {
+    flex: 1;
+    height: calc(90 * var(--sy));
+    flex-shrink: 0;
+}
+
+.friend-action {
+    flex: 1;
+    height: calc(90 * var(--sy));
+    flex-shrink: 0;
+}
+
+.history-row {
+    display: flex;
+    align-items: center;
+    gap: calc(10 * var(--sx))
+}
+
+.game-box {
+    flex: 2;
+    height: calc(90 * var(--sy));
+    flex-shrink: 0;
+}
+
+.game-role {
+    flex: 1;
+    height: calc(90 * var(--sy));
+    flex-shrink: 0;
+}
+
+.game-ruleset {
+    flex: 1;
+    height: calc(90 * var(--sy));
+    flex-shrink: 0;
+}
+
+.game-result {
+    flex: 1;
+    height: calc(90 * var(--sy));
+    flex-shrink: 0;
+}
+
+.modal-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 1000;
+
+    /* hidden by default */
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.modal-overlay.active {
+    visibility: visible;
+    opacity: 1;
+}
+
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    width: calc(700 * var(--sx));
+    padding: calc(20 * var(--s));
+
+    background-color: #00212D;
+    border-radius: calc(20 * var(--s));
+    border: calc(2 * var(--s)) solid #598392;
+
+    gap: calc(20 * var(--sy));
+}
+
+.invite-message {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+}
+
+.invite-actions {
+    display: flex;
+    gap: calc(20 * var(--sx));
+    justify-content: center;
+}
+
+.game-table {
+    position: relative;
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.game-table .top-bar {
+    position: absolute;
+    top: calc(10 * var(--sy));
+    right: calc(10 * var(--sx));
+    z-index: 20;
+}
+
+.card {
+    aspect-ratio: 2.25 / 3.5;
+    box-sizing: border-box;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    user-select: none;
+}
+
+
+.center-piles {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -55%);
+    display: flex;
+    gap: calc(60 * var(--sx));
+    z-index: 8;
+}
+
+.pile-card {
+    width: calc(110 * var(--sx));
+    cursor: pointer;
+}
+
+
+.meld-area {
+    position: absolute;
+    top: calc(360 * var(--sy));
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(900 * var(--sx));
+    min-height: calc(260 * var(--sy));
+    display: flex;
+    flex-direction: column;
+    gap: calc(18 * var(--sy));
+    align-items: center;
+    z-index: 6;
+}
+
+.meld-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(110 * var(--sy));
+}
+
+.table-card {
+    width: calc(95 * var(--sx));
+    margin-left: calc(-20 * var(--sx));
+}
+
+.table-card:first-child {
+    margin-left: 0;
+}
+
+
+.opponents-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+}
+
+.opponent-seat {
+    position: absolute;
+    width: 0;
+    height: 0;
+}
+
+.opponent-label {
+    position: absolute;
+    left: 50%;
+    top: calc(-28 * var(--sy));
+    transform: translateX(-50%);
+    white-space: nowrap;
+    color: #E6E1C5;
+    font-size: calc(18 * var(--s));
+}
+
+.opponent-fan {
+    position: relative;
+    width: 0;
+    height: 0;
+}
+
+.opponent-card {
+    position: absolute;
+    width: calc(90 * var(--sx));
+    transform-origin: center center;
+}
+
+
+.player-hand-wrapper {
+    position: absolute;
+    left: 50%;
+    bottom: calc(12 * var(--sy));
+    transform: translateX(-50%);
+    width: calc(980 * var(--sx));
+    height: calc(250 * var(--sy));
+    z-index: 10;
+}
+
+.player-hand {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.hand-card {
+    position: absolute;
+    width: calc(120 * var(--sx));
+    cursor: pointer;
+    transform-origin: bottom center;
+}
+
+.sort-hand-button {
+    position: absolute;
+    right: calc(120 * var(--sx));
+    bottom: calc(40 * var(--sy));
+    z-index: 12;
 }

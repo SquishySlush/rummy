@@ -100,3 +100,24 @@ class UserRepository:
             return True, None
         
         return False, "Password incorrect"
+    
+    @staticmethod
+    def get_all_users_except(db, user_id):
+        result = db.execute("SELECT * FROM Users WHERE user_id != %s ORDER BY username ASC",
+                            (user_id))
+        
+        rows = result.fetchall()
+
+        if rows == []:
+            return False, "No Users Found"
+        return True, rows
+    
+    @staticmethod
+    def get_user_guest_status(db, user_id):
+        result = db.execute("SELECT guest FROM Users WHERE user_id = %s")
+
+        row = result.fetchone()
+
+        if row is None:
+            return False, "User Not Found"
+        return row, None

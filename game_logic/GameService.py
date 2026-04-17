@@ -40,6 +40,20 @@ class GameService:
         
         game.add_player(new_player)
         return True, game_id
+    
+    def get_lobby_players(self, game_id):
+        game = self.active_games.get(game_id)
+        if game is None:
+            return False, "Game Not Found"
+
+        players = []
+        for p in game.players:
+            players.append({
+                "user_id": p.player_id,
+                "username": p.username
+            })
+
+        return True, players
         
     def start_game(self, game_id):
         game = self.active_games[game_id]
@@ -167,7 +181,7 @@ class GameService:
         for meld in game.table_melds:
             meld_cards = []
             for card in meld.cards:
-                meld.append(card.to_dict())
+                meld_cards.append(card.to_dict())
             table_melds.append(meld_cards)
         
         players = []
@@ -227,7 +241,7 @@ class GameService:
             hand = Hand()
             player = Player(user["user_id"], username, hand)
             self.active_players[user["user_id"]] = player
-            return user, None
+            return True, user
         return False, error
 
     def log_out(self, user_id, is_guest):
@@ -273,3 +287,6 @@ class GameService:
             if any(p.player_id == player_id for p in game.players):
                 return game_id
         return None
+    
+    def get_user_guest_status(self, user_id):
+        return self.db.get_user_guest_status(user_id)

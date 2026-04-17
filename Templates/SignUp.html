@@ -3,7 +3,10 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Sign Up</title>
+
         <link rel="stylesheet" href="{{ url_for('static', filename='Styles.css') }}">
+        <script defer src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+        <script defer src="{{ url_for('static', filename='js/SignUp.js') }}"></script>
     </head>
     <body>
         <div class="screen-wrapper">
@@ -12,10 +15,10 @@
                     <a href="/">
                     <img class = "logo" src="{{ url_for('static', filename='textures/logo.png') }}" alt="LOGO">
                     </a>
-                    <input class="box field" name="username" type="text" placeholder="Username"> 
-                    <input class="box field" name="email" type="text" placeholder="Email">
-                    <input class="box field" name="password" type="text" placeholder="Password">
-                    <button class="box button signup-button">Sign Up</button>
+                    <input class="box field" name="username" type="text" placeholder="Username" id="username-field"> 
+                    <input class="box field" name="email" type="text" placeholder="Email" id="password-field">
+                    <input class="box field" name="password" type="password" placeholder="Password" id="password-field">
+                    <button class="box button signup-button" id="signup-button">Sign Up</button>
                 </div>
             </div>
         </div>
