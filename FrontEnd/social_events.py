@@ -1,5 +1,5 @@
 from flask_socketio import SocketIO, join_room, emit
-from socket_decorators import socket_user_required, socket_registered_only
+from .socket_decorators import socket_user_required, socket_registered_only
 
 from flask import session
 
@@ -32,7 +32,7 @@ def social_events(socketio, game_service):
     @socketio.on("reject_request")
     @socket_registered_only
     def on_rejest_request(data):
-        success, error = game_service.reject_friend_request(session["friend_id"], data["user_id"])
+        success, error = game_service.reject_friend_request(session["user_id"], data["friend_id"])
         if not success:
             emit("error", {"error": error})
             return

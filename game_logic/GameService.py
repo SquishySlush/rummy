@@ -279,6 +279,9 @@ class GameService:
     def get_pending_requests(self, user_id):
         return self.db.get_pending_requests(user_id)
     
+    def get_all_users_except(self, user_id):
+        return self.db.get_all_users_except(user_id)
+    
     def get_player_history(self, user_id):
         return self.db.get_player_history(user_id)
     

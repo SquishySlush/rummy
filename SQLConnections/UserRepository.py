@@ -104,7 +104,7 @@ class UserRepository:
     @staticmethod
     def get_all_users_except(db, user_id):
         result = db.execute("SELECT * FROM Users WHERE user_id != %s ORDER BY username ASC",
-                            (user_id))
+                            (user_id,))
         
         rows = result.fetchall()
 
@@ -114,10 +114,23 @@ class UserRepository:
     
     @staticmethod
     def get_user_guest_status(db, user_id):
-        result = db.execute("SELECT guest FROM Users WHERE user_id = %s")
+        result = db.execute("SELECT guest FROM Users WHERE user_id = %s",
+                            (user_id,))
 
+        rows = result.fetchone()
+
+        if rows is None:
+            return False, "User Not Found"
+        return True, rows
+    
+    @staticmethod
+    def get_username_by_user_id(db, user_id):
+        result = db.execute("SELECT username FROM Users WHERE user_id = %s",
+                            (user_id,))
+        
         row = result.fetchone()
 
         if row is None:
-            return False, "User Not Found"
-        return row, None
+            return False, "User Not Fount"
+        return True, row["username"]
+    

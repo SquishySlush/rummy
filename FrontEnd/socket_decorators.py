@@ -16,7 +16,7 @@ def socket_registered_only(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         if not session.get("user_id"):
-            emit("error", {"error": "login Required"})
+            emit("error", {"error": "Login Required"})
             return
         if session.get("guest", False):
             emit("error", {"error" : "Registered Account Required"})

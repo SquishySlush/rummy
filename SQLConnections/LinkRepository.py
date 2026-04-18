@@ -79,7 +79,7 @@ class LinkRepository:
     
     @staticmethod
     def get_friends(db, user_id):
-        result = db.execute("SELECT * FROM FriendsList WHERE user_id = %s",
+        result = db.execute("SELECT * FROM FriendsList WHERE user_id = %s AND status = Accepted",
                             (user_id,))
         
         rows = result.fetchall()

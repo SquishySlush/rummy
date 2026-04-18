@@ -1,5 +1,5 @@
 from flask_socketio import SocketIO, join_room, emit
-from socket_decorators import socket_in_game, socket_user_required
+from .socket_decorators import socket_in_game, socket_user_required
 from flask import session
 
 def game_events(socketio, game_service):
@@ -12,9 +12,6 @@ def game_events(socketio, game_service):
         if not game_id:
             emit("error", {"error": "No active game"})
             return
-
-        join_room(str(game_id))
-        emit("message", {"message": "Joined Game Room"})
 
         join_room(str(game_id))
         emit("message", {"message": "Joined Game Room"})

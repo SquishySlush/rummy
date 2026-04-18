@@ -77,7 +77,41 @@ class DatabaseService:
         return LinkRepository.delete_friend(self.db, user_id, friend_id)
     
     def get_all_users_except(self, user_id):
-        return UserRepository.get_all_users_except(user_id)
+        success, rows = UserRepository.get_all_users_except(self.db, user_id)
+
+        if not success:
+            return False, rows
+        
+
+        friend_ids = set()
+        pending_ids = set()
+
+        success, friends = self.get_friends(user_id)
+        if success:
+            for friend in friends:
+                friend_ids.add(friend.get("user_id"))
+        
+        success, pending = self.get_pending_requests(user_id)
+        if success:
+            for request in pending:
+                pending_ids.add(request.get("user_id"))
+
+        other_users = []
+
+        for user in rows:
+            u_id = user.get("user_id")
+            if u_id not in friend_ids or u_id not in pending_ids:
+                continue
+
+            success, username = UserRepository.get_username_by_user_id(self.db, user.get("user_id"))
+            if success:
+                other_users.append({
+                    "user_id": user.get("user_id"),
+                    "username": username}
+                )
+        if other_users == []:
+            return False, "No Users Found"
+        return True, other_users
     
     def get_friends(self, user_id):
         success, rows = LinkRepository.get_friends_by_status(self.db, user_id, "Accepted")
@@ -88,19 +122,27 @@ class DatabaseService:
         friends = []
 
         for row in rows:
-            user, error = UserRepository.get_user_by_id(self.db, row["friend_id"])
-            if user is not None:
-                friends.append(user)
+            if row["user_id"] == user_id:
+                other_id = row["friend_id"]
+            else:
+                other_id = row["user_id"]
+            success, username = UserRepository.get_username_by_user_id(self.db, other_id)
+            if success:
+                friends.append({
+                    "user_id" : other_id,
+                    "username" : username
+                })
             
-            if friends == []:
-                return False, "No Firends Found"
-            return True, friends
+        if friends == []:
+            return False, "No Firends Found"
+        return True, friends
     
     def get_pending_requests(self, user_id):
         success, rows = LinkRepository.get_friends_by_status(self.db, user_id, "Pending")
 
         if not success:
             return False, rows
+        
         requests = []
 
         for row in rows:
@@ -111,14 +153,17 @@ class DatabaseService:
                 other_id = row["user_id"]
                 direction = "incoming"
             
-            user, error = UserRepository.get_user_by_id(self.db, other_id)
+            success, username = UserRepository.get_username_by_user_id(self.db, other_id)
 
-            if user is not None:
-                requests.append({"user": user, "direction" : direction})
+            if success:
+                requests.append({
+                    "user_id": other_id,
+                    "username": username, 
+                    "direction" : direction})
             
-            if requests == []:
-                return False, "No Pending Requests"
-            return True, requests
+        if requests == []:
+            return False, "No Pending Requests"
+        return True, requests
     
     def create_game(self, ruleset, seed):
         return GameRepository.create_game(self.db, ruleset, "LOBBY", seed)
