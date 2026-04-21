@@ -7,6 +7,11 @@
         <title>Game Lobby</title>
 
         <link rel="stylesheet" href="{{ url_for('static', filename='Styles.css') }}">
+
+        <script>
+            window.CURRENT_USER_ID = {{ session["user_id"] | tojson });
+        </script>
+
         <script defer src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
         <script defer src="{{ url_for('static', filename='js/GameLobby.js') }}"></script>
     </head>

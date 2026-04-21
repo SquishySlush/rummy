@@ -24,12 +24,13 @@ def game_routes(game_service):
     @not_in_game
     def join_game():
         data = request.get_json()
-        valid, game_id =  game_service.add_player(session["user_id"], data["game_id"])
+        ruleset = data.get("ruleset")
+        valid, game_id =  game_service.add_player(session["user_id"], ruleset)
 
         if valid:
             session["game_id"] = game_id
             return jsonify({"game_id" : game_id}), 200
-        return jsonify({"message" : game_id})
+        return jsonify({"error" : game_id})
     
     @game_blueprint.route("/start_game", methods = ["POST"])
     @user_required

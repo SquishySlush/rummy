@@ -38,16 +38,12 @@
 
 //     socket.on("social_list", (data) => {
 //         if (!data.success) {
-//             console.error("Failed to load friends list");
+//             console.error("Failed to load socials");
 //             return;
 //         }
 
 //         friends = Array.isArray(data.friends) ? data.friends : [];
 //         renderInviteFriends();
-//     });
-
-//     socket.on("lobby_invite_received", (data) => {
-//         console.log("Lobby invite received:", data);
 //     });
 
 //     socket.on("message", (data) => {
@@ -66,8 +62,8 @@
 //     const startButton = document.getElementById("start-button");
 //     const exportButton = document.getElementById("export-button");
 //     const importButton = document.getElementById("import-button");
-//     const saveButton = document.getElementById("save-button");
 //     const inviteCloseButton = document.getElementById("invite-close");
+//     const saveButton = document.getElementById("save-button");
 
 //     if (inviteButton) {
 //         inviteButton.addEventListener("click", openInviteModal);
@@ -89,12 +85,12 @@
 //         importButton.addEventListener("click", importRules);
 //     }
 
-//     if (saveButton) {
-//         saveButton.style.display = "none";
-//     }
-
 //     if (inviteCloseButton) {
 //         inviteCloseButton.addEventListener("click", closeInviteModal);
+//     }
+
+//     if (saveButton) {
+//         saveButton.style.display = "none";
 //     }
 // }
 
@@ -179,6 +175,7 @@
 
 // function getCurrentPlayer() {
 //     const currentUserId = getCurrentUserId();
+
 //     if (currentUserId === null) {
 //         return null;
 //     }
@@ -319,13 +316,26 @@
 //     const controls = document.querySelectorAll("[name]");
 
 //     controls.forEach((control) => {
+//         if (!control.name) {
+//             return;
+//         }
+
 //         if (control.type === "checkbox") {
 //             rules[control.name] = control.checked;
-//         } else if (control.type === "number") {
-//             rules[control.name] = control.value === "" ? "" : Number(control.value);
-//         } else {
-//             rules[control.name] = control.value;
+//             return;
 //         }
+
+//         if (control.name === "wilds") {
+//             rules[control.name] = parseWilds(control.value);
+//             return;
+//         }
+
+//         if (control.type === "number") {
+//             rules[control.name] = control.value === "" ? null : Number(control.value);
+//             return;
+//         }
+
+//         rules[control.name] = control.value;
 //     });
 
 //     return rules;
@@ -335,19 +345,59 @@
 //     const controls = document.querySelectorAll("[name]");
 
 //     controls.forEach((control) => {
-//         if (!(control.name in rules)) {
+//         if (!control.name || !(control.name in rules)) {
 //             return;
 //         }
 
+//         const value = rules[control.name];
+
 //         if (control.type === "checkbox") {
-//             control.checked = Boolean(rules[control.name]);
-//         } else {
-//             control.value = rules[control.name];
+//             control.checked = Boolean(value);
+//             return;
 //         }
 
-//         control.dispatchEvent(new Event("change", { bubbles: true }));
-//         control.dispatchEvent(new Event("input", { bubbles: true }));
+//         if (control.name === "wilds") {
+//             control.value = formatWilds(value);
+//             return;
+//         }
+
+//         control.value = value ?? "";
 //     });
+// }
+
+// function parseWilds(value) {
+//     if (!value || !value.trim()) {
+//         return [];
+//     }
+
+//     return value
+//         .split(",")
+//         .map((entry) => entry.trim())
+//         .filter((entry) => entry.length > 0)
+//         .map((entry) => {
+//             const parts = entry.split(":");
+//             const rank = parts[0]?.trim() ?? "";
+//             const numberPart = parts[1] !== undefined ? Number(parts[1].trim()) : 0;
+
+//             return [rank, Number.isNaN(numberPart) ? 0 : numberPart];
+//         });
+// }
+
+// function formatWilds(wilds) {
+//     if (!Array.isArray(wilds)) {
+//         return "";
+//     }
+
+//     return wilds
+//         .map((item) => {
+//             if (!Array.isArray(item) || item.length < 2) {
+//                 return "";
+//             }
+
+//             return `${item[0]}:${item[1]}`;
+//         })
+//         .filter((item) => item.length > 0)
+//         .join(", ");
 // }
 
 // function exportRules() {

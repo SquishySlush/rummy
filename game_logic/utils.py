@@ -95,6 +95,8 @@ class Moves(Enum):
     Meld = "Meld"
     Lay_Off = "Lay_Off"    
     Deck_Shuffle = "Deck_Shuffle"
+    Sort_Rank = "Sort_Rank"
+    Sort_Suit = "Sort_Suit"
     
 class MeldTypes(Enum):
     

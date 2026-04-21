@@ -249,3 +249,7 @@ class Ruleset:
         with open(filename, 'r') as file:
             data = json.load(file)
         return cls(data)
+    
+    @classmethod
+    def from_dict(cls, dictionary):
+        return cls(dictionary)

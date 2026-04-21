@@ -206,8 +206,18 @@ class GameState:
                 return player
         return None
     
+    def select_card(self, player, card):
+        player.select_card(card)
+
+    def deselect_card(self, player, card):
+        player.deselect_card(card)
+    
     def _get_card_from_json(self, card_json):
         return Card.from_dict(card_json, self.ruleset)
+    
+    def sort_hand(self, player, sort_type):
+        if sort_type == "rank":
+            return player.sort
     
     def apply_move(self, move):
         move_type = Moves[move["move_type"]]
@@ -228,7 +238,7 @@ class GameState:
         
         elif move_type == Moves.Meld:
             cards = [self._get_card_from_json(card) for card in move["cards"]]
-            player.store_meld(cards, self.ruleset)
+            player.store_meld(self.ruleset)
             return self.play_stored_melds(player)
         
         elif move_type == Moves.Lay_Off:
@@ -240,5 +250,17 @@ class GameState:
             self.deck.shuffle()
             return True, None
         
+        elif move_type == Moves.Store_Card:
+            self.store_card(player)
+            return
+        
+        elif move_type == Moves.Sort_Rank:
+            player.sort_rank()
+            return
+        
+        elif move_type == Moves.Sort_Suit:
+            player.sort_suit()
+            return
+
         else:
             return False, "Unknown Move"
