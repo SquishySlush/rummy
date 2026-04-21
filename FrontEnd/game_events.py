@@ -40,6 +40,7 @@ def game_events(socketio, game_service):
                 "success": True,
                 "game_id": game_id,
                 "players": players
+                
             },
             to=str(game_id)
         )

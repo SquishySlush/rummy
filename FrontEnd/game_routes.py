@@ -35,7 +35,9 @@ def game_routes(game_service):
     @user_required
     @in_game
     def start_game():
-        game_service.start_game(session["game_id"])
+        data = request.get_json()
+        
+        game_service.start_game(session["game_id"], ruleset)
         return jsonify({"game_status" : "Game Started"})
 
     @game_blueprint.route("/pause_game", methods = ["POST"])

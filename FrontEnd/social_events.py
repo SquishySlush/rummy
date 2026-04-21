@@ -121,3 +121,17 @@ def social_events(socketio, game_service):
             "lobby_joined",
             {"game_id": game_id},
         )
+
+    @socketio.on("ready")
+    @socket_user_required
+    def on_ready(data):
+        user_id = session.get("user_id")
+        game_id = data.get("game_id")
+        success, error = game_service.ready(user_id, game_id)
+        if not success:
+            emit("error", {"error": error})
+            return
+        emit("message", {"message": "Readied Up"})
+        return
+        
+        

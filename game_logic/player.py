@@ -15,6 +15,7 @@ class Player:
         self.hand = hand
         self.current_stored_melds = []
         self.completed_stored_melds = []
+        self.ready = False
         self.score = 0
         self.has_melded = False
         self.has_drawn = False

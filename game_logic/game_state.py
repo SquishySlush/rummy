@@ -26,7 +26,7 @@ class GameState:
         self.game_state = GameStatus.LOBBY
         
         self.players = [player] #list of player objects, initally just the user who makes the lobby
-        
+
         self.deck = None
         self.discard_pile = None
         self.table_melds = []
@@ -51,10 +51,18 @@ class GameState:
                 return "Game Has Begun"
 
     
-    def start_game(self):
+    def ready(self, player):
+        player.ready = True
+
+    def start_game(self, ruleset):
         if self.game_state != GameStatus.LOBBY:
             return False, "Game Already Started"
+        for player in self.player:
+            if not player.ready:
+                return False, "Not All Players Ready"
         #Initialises the game and deals cards
+        new_ruleset = Ruleset.from_json_file(ruleset)
+        self.update_ruleset(new_ruleset)
         self.game_state = GameStatus.IN_PROGRESS
         
         #Shuffles the deck

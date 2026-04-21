@@ -527,3 +527,7 @@ body {
     bottom: calc(40 * var(--sy));
     z-index: 12;
 }
+
+.ready {
+    border: 2px solid rgb(3, 196, 3)
+}

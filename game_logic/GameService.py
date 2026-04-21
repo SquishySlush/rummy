@@ -18,11 +18,12 @@ class GameService:
         self.db = db_service
     
     def create_game(self, user_id, ruleset, seed=None):
-        player, error = self.get_active_player(user_id)
-        if player is None:
-            return False, error
-        if self.get_player_current_game(user_id):
-            return False, error
+        success, player = self.get_active_player(user_id)
+        if not success:
+            return False, player
+        success, game_id = self.get_player_current_game(user_id)
+        if not success:
+            return False, game_id
         success, game_id = self.db.create_game(ruleset, seed)
         if not success:
             return False, "could Not Create Game"
@@ -31,15 +32,30 @@ class GameService:
         return game_id, None
     
     def add_player(self, game_id, user_id):
-        new_player, error = self.get_active_player(user_id)
-        if new_player is None:
-            return False, error
+        success, player = self.get_active_player(user_id)
+        if not success:
+            return False, player
         game = self.active_games[game_id]
         if game.game_state != GameStatus.LOBBY:
             return False, "Game Not Available"
         
-        game.add_player(new_player)
+        game.add_player(player)
         return True, game_id
+    
+    def ready(self, user_id, game_id):
+        success, player = self.get_active_player(user_id)
+        if not success:
+            return False, player
+        success, players = self.get_lobby_players(game_id)
+        for p in players:
+            if p.get("user_id") == user_id:
+                game = self.active_games[game_id]
+                if game.game_state != GameStatus.LOBBY:
+                    return False, "Game Not Available"
+                
+                game.ready(player)
+                return True, game_id
+        return False, "Player Not in Lobby"
     
     def get_lobby_players(self, game_id):
         game = self.active_games.get(game_id)
@@ -50,20 +66,23 @@ class GameService:
         for p in game.players:
             players.append({
                 "user_id": p.player_id,
-                "username": p.username
+                "username": p.username,
+                "ready_status": p.ready
             })
 
         return True, players
         
-    def start_game(self, game_id):
+    def start_game(self, game_id, ruleset):
         game = self.active_games[game_id]
+        success, error = game.start_game(ruleset)
+        if not success:
+            return error
         
         self.db.start_game(game.ruleset, game.deck.seed)
         
         for player in game.players:
             self.db.add_player_to_game(player.user_id, game_id, "Player")
         
-        game.start_game()
         return game.game_status.name
     
     def pause_game(self, game_id):
@@ -211,8 +230,8 @@ class GameService:
     def get_active_player(self, user_id):
         player = self.active_players.get(user_id)
         if player is None:
-            return None, "Player Not Found"
-        return player, None
+            return False, "Player Not Found"
+        return True, player
 
     def create_guest(self):
         username = f"Guest_{uuid.uuid4().hex[:8]}"
@@ -288,8 +307,8 @@ class GameService:
     def get_player_current_game(self, player_id):
         for game_id, game in self.active_games.items():
             if any(p.player_id == player_id for p in game.players):
-                return game_id
-        return None
+                return True, game_id
+        return False, "Could Not Find Game"
     
     def get_user_guest_status(self, user_id):
         return self.db.get_user_guest_status(user_id)
