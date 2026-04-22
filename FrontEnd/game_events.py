@@ -66,6 +66,29 @@ def game_events(socketio, game_service):
             return
         
         emit_game_state()
+
+
+    @socketio.on("disconnect")
+    def on_disconnect():
+        user_id = session.get("user_id")
+        game_id = session.get("game_id")
+
+        if not user_id or not game_id:
+            return
+
+        success, message = game_service.pause_game(game_id)
+        if not success:
+            return
+
+        session.pop("game_id", None)
+
+        emit(
+            "game_paused",
+            {
+                "message": "A player disconnected. The game was paused."
+            },
+            to=str(game_id)
+        )
         
     @socketio.on("resume_game")
     @socket_user_required

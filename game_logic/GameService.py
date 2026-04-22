@@ -76,21 +76,24 @@ class GameService:
         game = self.active_games[game_id]
         success, error = game.start_game(ruleset)
         if not success:
-            return error
+            return False, error
         
         self.db.start_game(game.ruleset, game.deck.seed)
         
         for player in game.players:
             self.db.add_player_to_game(player.user_id, game_id, "Player")
         
-        return game.game_status.name
+        return True, None
     
     def pause_game(self, game_id):
         game = self.active_games[game_id]
+        if game is None:
+            return False, "Game Not Found"
         
         self.db.pause_game(game_id)
         game.pause_game()
         del self.active_games[game_id]
+        return True, None
     
     def load_paused_game(self, game_id, user_id):
         player, error = self.get_active_player(user_id)
@@ -211,6 +214,10 @@ class GameService:
                 "hand_size" : len(p.hand.cards),
                 "score" : p.score})
         
+        selected_cards = []
+        for card in player.get_stored_cards():
+            selected_cards.append(card.to_dict())
+        
         state = {
             "game_status" : game_status,
             "curent_player" : curent_player,
@@ -220,6 +227,7 @@ class GameService:
             "has_melded" : has_melded,
             "required_meld_score" : required_meld_score,
             "hand" : hand,
+            "selected_cards": selected_cards,
             "table_melds" : table_melds,
             "players" : players,
             "winner" : winner}

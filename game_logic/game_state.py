@@ -57,11 +57,11 @@ class GameState:
     def start_game(self, ruleset):
         if self.game_state != GameStatus.LOBBY:
             return False, "Game Already Started"
-        for player in self.player:
+        for player in self.players:
             if not player.ready:
                 return False, "Not All Players Ready"
         #Initialises the game and deals cards
-        new_ruleset = Ruleset.from_json_file(ruleset)
+        new_ruleset = Ruleset.from_dict(ruleset)
         self.update_ruleset(new_ruleset)
         self.game_state = GameStatus.IN_PROGRESS
         
@@ -141,6 +141,7 @@ class GameState:
         if valid:
             player.hand.remove_card(card)
             self.discard_pile.add_card(card)
+            self.next_turn()
             return True, None
         else:
             return False, error
@@ -206,18 +207,17 @@ class GameState:
                 return player
         return None
     
-    def select_card(self, player, card):
+    def _select_card(self, player, card):
         player.select_card(card)
 
-    def deselect_card(self, player, card):
+    def deselect_all(self, player):
+        player.deselect_all()
+
+    def _deselect_card(self, player, card):
         player.deselect_card(card)
     
-    def _get_card_from_json(self, card_json):
-        return Card.from_dict(card_json, self.ruleset)
-    
-    def sort_hand(self, player, sort_type):
-        if sort_type == "rank":
-            return player.sort
+    def _get_card_from_dcit(self, card_dict):
+        return Card.from_dict(card_dict, self.ruleset)
     
     def apply_move(self, move):
         move_type = Moves[move["move_type"]]
@@ -230,19 +230,21 @@ class GameState:
             return self.draw_from_discard_pile(player)
         
         elif move_type == Moves.Discard:
-            card = self._get_card_from_json(move["card"])
-            result = self.discard(player, card)
-            if result[0]:
-                self.check_win_condition(player)
-            return result
+            card = self._get_card_from_dcit(move["card"])
+            valid, error = self.discard(player, card)
+            if not valid:
+               return False, error
+            self.check_win_condition(player)
+            return True, None
+        
+        elif move_type == Moves.Store_Meld:
+            return player.store_meld(self.ruleset)
         
         elif move_type == Moves.Meld:
-            cards = [self._get_card_from_json(card) for card in move["cards"]]
-            player.store_meld(self.ruleset)
             return self.play_stored_melds(player)
         
         elif move_type == Moves.Lay_Off:
-            card = self._get_card_from_json(move["card"])
+            card = self._get_card_from_dcit(move["card"])
             meld = self.table_melds[move["meld_index"]]
             return self.lay_off(player, card, meld)
         
@@ -251,16 +253,19 @@ class GameState:
             return True, None
         
         elif move_type == Moves.Store_Card:
-            self.store_card(player)
-            return
+            self._select_card(player)
+            return True, None
+        
+        elif move_type == Moves.Deselect_all:
+            self.deselect_all(player)
         
         elif move_type == Moves.Sort_Rank:
             player.sort_rank()
-            return
+            return True, None
         
         elif move_type == Moves.Sort_Suit:
             player.sort_suit()
-            return
+            return True, None
 
         else:
             return False, "Unknown Move"

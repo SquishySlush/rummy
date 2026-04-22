@@ -2,6 +2,7 @@
 from flask import Blueprint, request, jsonify, session
 from FrontEnd.auth_decorators import registered_only, user_required
 from FrontEnd.game_decorators import in_game, not_in_game
+from flask_socketio import emit
 
 game_blueprint = Blueprint("game", __name__)
 
@@ -38,7 +39,16 @@ def game_routes(game_service):
     def start_game():
         data = request.get_json()
         
-        game_service.start_game(session["game_id"], ruleset)
+        ruleset = data.get("ruleset")
+        success, error = game_service.start_game(session["game_id"], ruleset)
+
+        if not success:
+            return jsonify({"error"L error}), 400
+        
+        socketio.emit("game_started",
+                      {"game_id": session["game_id"]},
+                      to=str(session["game_id"]))
+            
         return jsonify({"game_status" : "Game Started"})
 
     @game_blueprint.route("/pause_game", methods = ["POST"])

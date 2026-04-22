@@ -27,11 +27,13 @@ class Player:
         is_valid, meld_type = Validator.validate_meld(self.stored_cards, ruleset)
         
         if not is_valid:
-            return is_valid, meld_type
+            return False, meld_type
         
         meld = Meld(self.stored_cards, meld_type, ruleset)
         
         self.current_stored_melds.append(meld)
+
+        self.deselect_all()
         return True, meld
     
     def select_card(self, card):
@@ -39,6 +41,9 @@ class Player:
 
     def deselect_card(self, card):
         self.hand.deselect_card(card)
+
+    def deselect_all(self):
+        self.hand.deselect_all()
 
     def reset_current_stored_melds(self):    
         self.curent_stored_melds = []
@@ -61,6 +66,9 @@ class Player:
             self.score += points
         else:
             self.score -= points
+    
+    def get_stored_cards(self):
+        return self.stored_cards
     
     
     def reset_player(self):

@@ -1,106 +1,106 @@
-// let socket;
+let socket;
 
-// let historyList = [];
+let historyList = [];
 
-// document.addEventListener("DOMContentLoaded", () => {
-//     init();
-// });
+document.addEventListener("DOMContentLoaded", () => {
+    init();
+});
 
-// function init() {
-//     socket = io();
+function init() {
+    socket = io();
 
-//     setupListeners();
-//     requestHistory();
-// }
+    setupListeners();
+    requestHistory();
+}
 
-// function setupListeners() {
-//     const searchInput = document.getElementById("history-search");
+function setupListeners() {
+    const searchInput = document.getElementById("history-search");
 
-//     searchInput.addEventListener("input", renderHistoryList);
+    searchInput.addEventListener("input", renderHistoryList);
 
-//     socket.on("connect", () => {
-//         requestHistory();
-//     });
+    socket.on("connect", () => {
+        requestHistory();
+    });
 
-//     socket.on("game_history", (data) => {
-//         if (!data.success) {
-//             console.error(data.error || "Failed to load game history");
-//             return;
-//         }
+    socket.on("game_history", (data) => {
+        if (!data.success) {
+            console.error(data.error || "Failed to load game history");
+            return;
+        }
 
-//         historyList = Array.isArray(data.history) ? data.history : [];
-//         renderHistoryList();
-//     });
+        historyList = Array.isArray(data.history) ? data.history : [];
+        renderHistoryList();
+    });
 
-//     socket.on("error", (data) => {
-//         console.error(data.error || "Socket error");
-//     });
-// }
+    socket.on("error", (data) => {
+        console.error(data.error || "Socket error");
+    });
+}
 
-// function requestHistory() {
-//     socket.emit("get_history");
-// }
+function requestHistory() {
+    socket.emit("get_history");
+}
 
-// function renderHistoryList() {
-//     const container = document.getElementById("game-history");
-//     const query = document.getElementById("history-search").value.trim().toLowerCase();
+function renderHistoryList() {
+    const container = document.getElementById("game-history");
+    const query = document.getElementById("history-search").value.trim().toLowerCase();
 
-//     container.innerHTML = "";
+    container.innerHTML = "";
 
-//     const filteredHistory = historyList.filter((game) => matchesSearch(game, query));
+    const filteredHistory = historyList.filter((game) => matchesSearch(game, query));
 
-//     filteredHistory.forEach((game) => {
-//         const row = createHistoryRow(game);
-//         container.appendChild(row);
-//     });
-// }
+    filteredHistory.forEach((game) => {
+        const row = createHistoryRow(game);
+        container.appendChild(row);
+    });
+}
 
-// function matchesSearch(game, query) {
-//     if (!query) {
-//         return true;
-//     }
+function matchesSearch(game, query) {
+    if (!query) {
+        return true;
+    }
 
-//     const gameId = String(game.game_id || "").toLowerCase();
-//     const role = String(game.role || "").toLowerCase();
-//     const ruleset = String(game.ruleset || "").toLowerCase();
-//     const result = String(game.result || "").toLowerCase();
+    const gameId = String(game.game_id || "").toLowerCase();
+    const role = String(game.role || "").toLowerCase();
+    const ruleset = String(game.ruleset || "").toLowerCase();
+    const result = String(game.result || "").toLowerCase();
 
-//     return (
-//         gameId.includes(query) ||
-//         role.includes(query) ||
-//         ruleset.includes(query) ||
-//         result.includes(query)
-//     );
-// }
+    return (
+        gameId.includes(query) ||
+        role.includes(query) ||
+        ruleset.includes(query) ||
+        result.includes(query)
+    );
+}
 
-// function createHistoryRow(game) {
-//     const row = document.createElement("div");
-//     row.className = "history-row";
+function createHistoryRow(game) {
+    const row = document.createElement("div");
+    row.className = "history-row";
 
-//     const gameIdEl = createLabel(game.game_id ?? "Game ID", "game-box");
-//     const roleEl = createLabel(game.role ?? "ROLE", "game-role");
-//     const rulesetEl = createLabel(game.ruleset ?? "Ruleset", "game-ruleset");
-//     const resultEl = createLabel(formatResult(game.result), "game-result");
+    const gameIdEl = createLabel(game.game_id ?? "Game ID", "game-box");
+    const roleEl = createLabel(game.role ?? "ROLE", "game-role");
+    const rulesetEl = createLabel(game.ruleset ?? "Ruleset", "game-ruleset");
+    const resultEl = createLabel(formatResult(game.result), "game-result");
 
-//     row.appendChild(gameIdEl);
-//     row.appendChild(roleEl);
-//     row.appendChild(rulesetEl);
-//     row.appendChild(resultEl);
+    row.appendChild(gameIdEl);
+    row.appendChild(roleEl);
+    row.appendChild(rulesetEl);
+    row.appendChild(resultEl);
 
-//     return row;
-// }
+    return row;
+}
 
-// function createLabel(text, className) {
-//     const el = document.createElement("div");
-//     el.className = `box button ${className}`;
-//     el.textContent = text;
-//     return el;
-// }
+function createLabel(text, className) {
+    const el = document.createElement("div");
+    el.className = `box button ${className}`;
+    el.textContent = text;
+    return el;
+}
 
-// function formatResult(result) {
-//     if (!result) {
-//         return "RESULT";
-//     }
+function formatResult(result) {
+    if (!result) {
+        return "RESULT";
+    }
 
-//     return String(result);
-// }
+    return String(result);
+}
