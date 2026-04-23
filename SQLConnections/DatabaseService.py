@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Apr 11 15:32:38 2026
-
-@author: Faisal Mustafa
-"""
-
 from SQLConnections.DBConnections import dbconnection
 from SQLConnections.UserRepository import UserRepository
 from SQLConnections.GameRepository import GameRepository

@@ -1,87 +1,134 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Apr 10 20:57:27 2026
-
-@author: Faisal Mustafa
-"""
-
 import json
 
+
 class GameRepository:
-    
+    """
+    Handles all database operations related to games.
+
+    All methods return:
+    (True, value) on success OR (False, error_message) on failure.
+    """
+
     @staticmethod
     def create_game(db, ruleset, status, seed):
-        ruleset_string  = json.dumps(ruleset.to_dict())
-        
-        db.execute("INSERT INTO Games (ruleset, status, seed) VALUES (%s, %s, %s)",
-                   (ruleset_string, status, seed))
+        """
+        Create a new game record.
+
+        The ruleset object is converted into JSON before storage.
+        """
+        ruleset_string = json.dumps(ruleset.to_dict())
+
+        db.execute(
+            "INSERT INTO Games (ruleset, status, seed) VALUES (%s, %s, %s)",
+            (ruleset_string, status, seed)
+        )
         db.commit()
+
         game_id = db.cursor.lastrowid
         return True, game_id
-    
+
     @staticmethod
     def change_status(db, game_id, status):
-        db.execute("UPDATE Games SET status = %s WHERE game_id = %s",
-                   (status, game_id))
+        """
+        Update the status of a game.
+        """
+        db.execute(
+            "UPDATE Games SET status = %s WHERE game_id = %s",
+            (status, game_id)
+        )
         db.commit()
-        
+
         return True, None
-    
+
     @staticmethod
     def get_status(db, game_id):
-        result = db.execute("SELECT status FROM Games WHERE game_id = %s",
-                            (game_id))
-        
+        """
+        Retrieve the status of a game.
+        """
+        result = db.execute(
+            "SELECT status FROM Games WHERE game_id = %s",
+            (game_id,)
+        )
+
         row = result.fetchone()
-        
         if row is None:
-            return None, "Game Not Found"
-        return row
-    
+            return False, "Game Not Found"
+
+        return True, row["status"]
+
     @staticmethod
     def get_game(db, game_id):
-        result = db.execute("SELECT * FROM Games WHERE game_id = %s",
-                            (game_id,))
-        
+        """
+        Retrieve full game record.
+        """
+        result = db.execute(
+            "SELECT * FROM Games WHERE game_id = %s",
+            (game_id,)
+        )
+
         row = result.fetchone()
         if row is None:
-            return None, "Game Not Found"
-        return row, None
-    
+            return False, "Game Not Found"
+
+        return True, row
+
     @staticmethod
     def get_ruleset(db, game_id):
-        result = db.execute("SELECT ruleset FROM Games WHERE game_id = %s",
-                            (game_id,))
-        
-        ruleset = result.fetchone()
-        if ruleset is None:
-            return None, "Game Not Found"
-        return json.loads(ruleset["ruleset"]), None
+        """
+        Retrieve and decode the stored ruleset.
+        """
+        result = db.execute(
+            "SELECT ruleset FROM Games WHERE game_id = %s",
+            (game_id,)
+        )
+
+        row = result.fetchone()
+        if row is None:
+            return False, "Game Not Found"
+
+        return True, json.loads(row["ruleset"])
 
     @staticmethod
     def delete_game(db, game_id):
-        db.execute("DELETE FROM Games WHERE game_id = %s",
-                   (game_id,))
+        """
+        Delete a game record.
+        """
+        db.execute(
+            "DELETE FROM Games WHERE game_id = %s",
+            (game_id,)
+        )
         db.commit()
-        
+
         return True, None
-    
+
     @staticmethod
     def get_games_by_status(db, status):
-        result = db.execute("SELECT game_id FROM Games WHERE status = %s",
-                            (status,))
-        
+        """
+        Retrieve all game IDs with a given status.
+        """
+        result = db.execute(
+            "SELECT game_id FROM Games WHERE status = %s",
+            (status,)
+        )
+
         rows = result.fetchall()
-        if rows is None:
-            return None, "No Games With That Status Found"
-        return rows, None
-    
+        if not rows:
+            return False, "No Games With That Status Found"
+
+        return True, rows
+
     @staticmethod
     def get_seed(db, game_id):
-        result = db.execute("SELECT seed FROM Games WHERE game_id = %s",
-                            (game_id,))
-        
-        seed = result.fetchone()
-        if seed is None:
-            return None, "Game Does Not Exist"
-        return seed["seed"], None
+        """
+        Retrieve the seed used for a game.
+        """
+        result = db.execute(
+            "SELECT seed FROM Games WHERE game_id = %s",
+            (game_id,)
+        )
+
+        row = result.fetchone()
+        if row is None:
+            return False, "Game Does Not Exist"
+
+        return True, row["seed"]

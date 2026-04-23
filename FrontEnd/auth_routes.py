@@ -1,13 +1,29 @@
 from flask import Blueprint, request, jsonify, session
 from FrontEnd.auth_decorators import registered_only, user_required
 
+
 auth_blueprint = Blueprint("auth", __name__)
 
-def auth_routes(game_service):
 
-    @auth_blueprint.route("/sign_up", methods = ["POST"])
+def auth_routes(game_service):
+    """
+    Register all authentication-related routes.
+
+    These routes handle:
+    - sign up
+    - log in
+    - log out
+    - guest account creation
+    - changing account details
+    - deleting an account
+    """
+
+    @auth_blueprint.route("/sign_up", methods=["POST"])
     def sign_up():
-        data = request.get_json()
+        """
+        Create a new registered user account and log the user in immediately.
+        """
+        data = request.get_json() or {}
 
         username = data.get("username", "").strip()
         password = data.get("password", "")
@@ -18,37 +34,53 @@ def auth_routes(game_service):
 
         success, message = game_service.sign_up(username, password, email)
         if success:
-            message, number = _login_user(username, password)
-            if number >= 400:
-                return jsonify({"error": message}), number
-            return jsonify({"message" : message}), number
+            message, status_code = _login_user(username, password)
+            if status_code >= 400:
+                return jsonify({"error": message}), status_code
+            return jsonify({"message": message}), status_code
 
-        return jsonify({"error" : message}), 400
+        return jsonify({"error": message}), 400
 
-    @auth_blueprint.route("/login", methods = ["POST"])
+    @auth_blueprint.route("/login", methods=["POST"])
     def login():
-        data = request.get_json()
+        """
+        Log a registered user into an existing account.
+        """
+        data = request.get_json() or {}
 
         username = data.get("username", "").strip()
         password = data.get("password", "")
 
-        message, number = _login_user(username, password)
-        if number >= 400:
-            return jsonify({"error": message}), number
-        return jsonify({"message" : message}), number
+        if not username or not password:
+            return jsonify({"error": "Username and password are required"}), 400
 
-    @auth_blueprint.route("/log_out", methods = ["POST"])
+        message, status_code = _login_user(username, password)
+        if status_code >= 400:
+            return jsonify({"error": message}), status_code
+
+        return jsonify({"message": message}), status_code
+
+    @auth_blueprint.route("/log_out", methods=["POST"])
     @user_required
     def log_out():
+        """
+        Log the current user out and clear their session.
+        """
         user_id = session.get("user_id")
-        guest = session.get("guest", None)
+        guest = session.get("guest", False)
 
         game_service.log_out(user_id, guest)
         session.clear()
-        return jsonify({"message" : "Logged Out"}), 200
+
+        return jsonify({"message": "Logged Out"}), 200
 
     @auth_blueprint.route("/guest", methods=["POST"])
     def guest_login():
+        """
+        Create and log in a guest account.
+
+        If a session already exists, the existing session details are returned.
+        """
         if session.get("user_id"):
             return jsonify({
                 "message": "Session already exists",
@@ -61,61 +93,89 @@ def auth_routes(game_service):
         if not success:
             return jsonify({"error": user}), 400
 
-        session["guest"] = True
-        session["username"] = user["username"]
         session["user_id"] = user["user_id"]
+        session["username"] = user["username"]
+        session["guest"] = True
 
         return jsonify({
-            "message": "Guest account created",
+            "message": "Guest Account Created",
             "user_id": user["user_id"],
             "username": user["username"],
             "guest": True
         }), 200
 
-    @auth_blueprint.route("/change_password", methods = ["POST"])
+    @auth_blueprint.route("/change_password", methods=["POST"])
     @registered_only
     def change_password():
-        data = request.get_json()
+        """
+        Change the password of the currently logged-in registered user.
+        """
+        data = request.get_json() or {}
+
         user_id = session.get("user_id")
-        old_password = data.get("old_password", None)
-        new_password = data.get("new_password", None)
+        old_password = data.get("old_password")
+        new_password = data.get("new_password")
 
-        result, error = game_service.change_password(user_id, old_password, new_password)
-        if result:
-            return jsonify({"message" : "Changed Password"}), 200
-        return jsonify({"error" : error}), 400
+        if not old_password or not new_password:
+            return jsonify({"error": "Old password and new password are required"}), 400
 
-    @auth_blueprint.route("/change_username", methods = ["POST"])
+        success, error = game_service.change_password(user_id, old_password, new_password)
+        if success:
+            return jsonify({"message": "Changed Password"}), 200
+
+        return jsonify({"error": error}), 400
+
+    @auth_blueprint.route("/change_username", methods=["POST"])
     @registered_only
     def change_username():
-        data = request.get_json()
+        """
+        Change the username of the currently logged-in registered user.
+        """
+        data = request.get_json() or {}
+
         user_id = session.get("user_id")
-        new_username = data.get("new_username", None)
+        new_username = data.get("new_username", "").strip()
 
-        result, error = game_service.change_username(user_id, new_username)
+        if not new_username:
+            return jsonify({"error": "New username is required"}), 400
 
-        if result:
-            session["username"] = data["new_username"]
-            return jsonify({"message" : "Username Changed"}), 200
-        return jsonify({"error" : error}), 400
+        success, error = game_service.change_username(user_id, new_username)
+        if success:
+            session["username"] = new_username
+            return jsonify({"message": "Username Changed"}), 200
 
-    @auth_blueprint.route("/delete_account", methods = ["POST"])
+        return jsonify({"error": error}), 400
+
+    @auth_blueprint.route("/delete_account", methods=["POST"])
     @registered_only
     def delete_account():
-        result, error = game_service.delete_account(session["user_id"])
-        if result:
+        """
+        Delete the currently logged-in registered user's account.
+        """
+        success, error = game_service.delete_account(session["user_id"])
+        if success:
             session.clear()
-            return jsonify({"message" : "Account Deleted"}), 200
-        return jsonify({"error" : error}), 400
+            return jsonify({"message": "Account Deleted"}), 200
 
+        return jsonify({"error": error}), 400
 
     def _login_user(username, password):
+        """
+        Authenticate a user and store their details in the session.
+
+        Args:
+            username (str): The username entered by the user.
+            password (str): The password entered by the user.
+
+        Returns:
+            tuple: A message and HTTP status code.
+        """
         success, user = game_service.log_in(username, password)
 
         if success:
             session["user_id"] = user["user_id"]
             session["username"] = user["username"]
             session["guest"] = False
-            session.pop("guest", None)
-            return ("Logged In", 200)
-        return (user, 401)
+            return "Logged In", 200
+
+        return user, 401

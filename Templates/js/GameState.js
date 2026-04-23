@@ -252,7 +252,7 @@ function renderOpponents() {
 
     const currentUserId = getCurrentUserId();
     const players = Array.isArray(gameState.players) ? gameState.players : [];
-    const opponents = players.filter((player) => Number(player.player_id) !== currentUserId);
+    const opponents = players.filter((player) => Number(player.user_id) !== currentUserId);
 
     const positions = [
         { left: "18%", top: "28%" },
@@ -272,7 +272,7 @@ function renderOpponents() {
         label.className = "opponent-label";
         label.textContent = `${opponent.username} (${opponent.hand_size})`;
 
-        if (Number(opponent.player_id) === Number(gameState.curent_player)) {
+        if (Number(opponent.user_id) === Number(gameState.curent_player)) {
             label.classList.add("turn-highlight");
         }
 
@@ -671,13 +671,13 @@ function isMyTurn() {
 
 function getCurrentTurnPlayer() {
     return (gameState?.players || []).find(
-        (player) => Number(player.player_id) === Number(gameState.curent_player)
+        (player) => Number(player.user_id) === Number(gameState.curent_player)
     ) || null;
 }
 
 function getMe() {
     return (gameState?.players || []).find(
-        (player) => Number(player.player_id) === getCurrentUserId()
+        (player) => Number(player.user_id) === getCurrentUserId()
     ) || null;
 }
 
@@ -687,7 +687,7 @@ function handleWinner() {
     }
 
     const winnerPlayer = (gameState.players || []).find(
-        (player) => Number(player.player_id) === Number(gameState.winner)
+        (player) => Number(player.user_id) === Number(gameState.winner)
     );
 
     const winnerName = winnerPlayer ? winnerPlayer.username : "Unknown";
