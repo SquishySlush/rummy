@@ -69,7 +69,7 @@ def create_app():
     game_service = GameService(db)
 
     auth_routes(game_service)
-    game_routes(game_service)
+    game_routes(game_service, socketio)
     social_routes(game_service)
 
     app.register_blueprint(auth_blueprint, url_prefix="/auth")
