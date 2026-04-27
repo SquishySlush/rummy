@@ -1,11 +1,4 @@
-from game_logic.utils import (
-    index_rank,
-    Suit,
-    rank_score,
-    MeldTypes,
-    split_wilds_non_wilds,
-    quicksort
-)
+from game_logic.utils import index_rank, Suit, rank_score, MeldTypes, split_wilds_non_wilds, quicksort
 
 
 class Meld:

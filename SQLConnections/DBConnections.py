@@ -59,4 +59,4 @@ class DBConnection:
         to free resources.
         """
         self.cursor.close()
-        self.connection.close()  # FIX: missing parentheses in your version
+        self.connection.close()

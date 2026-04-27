@@ -144,4 +144,3 @@ class Card:
         """
         with open(filename, 'w') as file:
             json.dump(self.to_dict(), file, indent=4)
-

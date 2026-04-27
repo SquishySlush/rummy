@@ -115,4 +115,3 @@ class Deck:
             cards (list[Card]): A list of Card objects to add to the deck.
         """
         self.cards.extend(cards)
-

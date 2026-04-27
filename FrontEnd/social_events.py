@@ -133,5 +133,3 @@ def social_events(socketio, game_service):
             return
         emit("message", {"message": "Readied Up"})
         return
-        
-        

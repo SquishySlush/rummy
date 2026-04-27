@@ -1,6 +1,5 @@
 import json
 
-
 class Ruleset:
     """
     Store and validate all configurable game rules for the rummy platform.
