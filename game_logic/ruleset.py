@@ -303,10 +303,10 @@ class Ruleset:
         if allowed_values is not None and value not in allowed_values:
             return default
 
-        if min_value is not None and value < min_value:
+        if min_value is not None and value is not None and value < min_value:
             return default
 
-        if max_value is not None and value > max_value:
+        if max_value is not None and value is not None and value > max_value:
             return default
 
         return value

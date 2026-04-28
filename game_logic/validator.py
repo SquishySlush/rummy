@@ -10,7 +10,7 @@ class Validator:
     """
 
     @staticmethod
-    def validate_set(meld, ruleset):
+    def validate_set(cards, ruleset):
         """
         Validate whether a meld forms a valid set.
 
@@ -27,19 +27,17 @@ class Validator:
         Returns:
             tuple: (True, MeldTypes.SET) if valid, otherwise (False, reason).
         """
-        if meld.meld_type != MeldTypes.SET:
-            return False, "Not Valid Meld Type"
 
-        if ruleset.max_meld_size_set is not None and len(meld) > ruleset.max_meld_size_set:
+        if ruleset.max_meld_size_set is not None and len(cards) > ruleset.max_meld_size_set:
             return False, "Meld Too Large"
-        if len(meld) < ruleset.min_meld_size:
+        if len(cards) < ruleset.min_meld_size:
             return False, "Meld Too Small"
 
         suits = []
         ranks = []
 
         # Collect rank and suit information for non-wild cards only.
-        for card in meld:
+        for card in cards:
             if not ruleset.is_wild(card):
                 ranks.append(card.rank)
                 suits.append(card.suit)
@@ -59,12 +57,11 @@ class Validator:
         return True, MeldTypes.SET
 
     @staticmethod
-    def validate_run(meld, ruleset):
+    def validate_run(cards, ruleset):
         """
         Validate whether a meld forms a valid run.
 
         A valid run must:
-        - Be of type RUN
         - Meet size constraints
         - Have cards of the same suit
         - Form a consecutive sequence, with wilds filling gaps
@@ -77,17 +74,15 @@ class Validator:
         Returns:
             tuple: (True, MeldTypes.RUN) if valid, otherwise (False, reason).
         """
-        if meld.meld_type != MeldTypes.RUN:
-            return False, "Not Valid Meld Type"
 
-        if ruleset.max_meld_size_run is not None and len(meld) > ruleset.max_meld_size_run:
+        if ruleset.max_meld_size_run is not None and len(cards) > ruleset.max_meld_size_run:
             return False, "Meld Too Large"
 
         # FIXED: this was '>' instead of '<'
-        if len(meld) < ruleset.min_meld_size:
+        if len(cards) < ruleset.min_meld_size:
             return False, "Meld Too Small"
 
-        wilds, non_wilds = split_wilds_non_wilds(meld, ruleset)
+        wilds, non_wilds = split_wilds_non_wilds(cards, ruleset)
 
         # Prevent all-wild runs if not allowed.
         if not ruleset.allow_wild_only_melds and len(non_wilds) == 0:
@@ -167,7 +162,7 @@ class Validator:
         return False, "Invalid Run"
 
     @staticmethod
-    def validate_meld(meld, ruleset):
+    def validate_meld(cards, ruleset):
         """
         Validate a meld by delegating to the appropriate method.
 
@@ -178,14 +173,15 @@ class Validator:
         Returns:
             tuple: Validation result.
         """
-        if meld.meld_type == MeldTypes.SET:
-            return Validator.validate_set(meld, ruleset)
+        set_valid, set_result = Validator.validate_set(cards, ruleset)
+        if set_valid:
+            return True, MeldTypes.SET
 
-        elif meld.meld_type == MeldTypes.RUN:
-            return Validator.validate_run(meld, ruleset)
+        run_valid, run_result = Validator.validate_run(cards, ruleset)
+        if run_valid:
+            return True, MeldTypes.RUN
 
-        else:
-            return False, "Invalid Meld Type"
+        return False, f"Invalid meld: set error = {set_result}, run error = {run_result}"
 
     @staticmethod
     def validate_play_melds(stored_melds, has_melded, ruleset, required_score):
