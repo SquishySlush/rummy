@@ -160,14 +160,14 @@ class Meld:
                     return 1
 
             if self.meld_type == "run":
-                if self._is_ace_high_in_run(card, ruleset):
+                if self._is_ace_high_in_run(ruleset):
                     return ruleset.ace_high_score
                 else:
                     return 1
 
         return card.return_value()
 
-    def _is_ace_high_in_run(self, ace_card, ruleset):
+    def _is_ace_high_in_run(self, ruleset):
         """
         Determine whether an Ace should be treated as high in a run.
 

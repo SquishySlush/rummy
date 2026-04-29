@@ -337,18 +337,30 @@ class Ruleset:
         return {
             'allow_sets': self.allow_sets,
             'allow_runs': self.allow_runs,
-            'min_meld_size': self.min_meld_size,
-            'max_meld_size_set': self.max_meld_size_set,
             'max_meld_size_run': self.max_meld_size_run,
             'min_initial_meld_score': self.min_initial_meld_score,
             'initial_meld_increment': self.initial_meld_increment,
-            'initial_hand_size': self.initial_hand_size,
-            'num_decks': self.num_decks,
             'wilds': self.wilds,
+            'wild_deadwood_score': self.wild_deadwood_score,
             'scoring_method': self.scoring_method,
+            'ace_low': self.ace_low,
             'ace_high': self.ace_high,
             'ace_both': self.ace_both,
-            'ace_high_score': self.ace_high_score
+            'ace_wrap_around': self.ace_wrap_around,
+            'ace_high_score': self.ace_high_score,
+            'initial_hand_size': self.initial_hand_size,
+            'min_meld_size': self.min_meld_size,
+            'max_meld_size_set': self.max_meld_size_set,
+            'num_decks': self.num_decks,
+            'require_melding_to_draw_from_disc': self.require_melding_to_draw_from_disc,
+            'require_melding_to_lay_off': self.require_melding_to_lay_off,
+            'allow_wild_replacement': self.allow_wild_replacement,
+            'allow_wild_only_melds': self.allow_wild_only_melds,
+            'prevent_discard_same_card': self.prevent_discard_same_card,
+            'points_for_winning': self.points_for_winning,
+            'max_deck_shuffle': self.max_deck_shuffle,
+            'winner_deadwood': self.winner_deadwood,
+            'max_players': self.max_players
         }
 
     def to_json_file(self, filename):
@@ -360,21 +372,6 @@ class Ruleset:
         """
         with open(filename, 'w') as file:
             json.dump(self.to_dict(), file, indent=4)
-
-    @classmethod
-    def from_json_file(cls, filename):
-        """
-        Create a Ruleset object from a JSON file.
-
-        Args:
-            filename (str): The name of the JSON file to read.
-
-        Returns:
-            Ruleset: A new Ruleset object built from the file data.
-        """
-        with open(filename, 'r') as file:
-            data = json.load(file)
-        return cls(data)
 
     @classmethod
     def from_dict(cls, dictionary):

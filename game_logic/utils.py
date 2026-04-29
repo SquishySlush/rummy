@@ -11,7 +11,7 @@ def sort_rank(cards):
     return quicksort(cards, key=lambda card: card.return_rank_index())
 
 
-def quicksort(items, key=lambda x: x):
+def quicksort(items, key=lambda x: x, reverse=False):
     """
     Sort a list using quicksort with an optional key function.
 
@@ -39,7 +39,10 @@ def quicksort(items, key=lambda x: x):
         else:
             lesser.append(item)
 
-    return quicksort(lesser, key) + [pivot] + quicksort(greater, key)
+    if reverse:
+        return quicksort(greater, key, reverse) + [pivot] + quicksort(lesser, key, reverse)
+    else:
+        return quicksort(lesser, key, reverse) + [pivot] + quicksort(greater, key, reverse)
 
 
 def split_wilds_non_wilds(cards, ruleset):

@@ -101,7 +101,7 @@ class GameService:
 
         success, players = self.get_lobby_players(game_id)
         for p in players:
-            if p.get("user_id") == user_id:
+            if p.user_id == user_id: # type: ignore
                 game = self.active_games[game_id]
                 if game.game_state != GameStatus.LOBBY:
                     return False, "Game Not Available"
@@ -127,11 +127,7 @@ class GameService:
 
         players = []
         for p in game.players:
-            players.append({
-                "user_id": p.user_id,
-                "username": p.username,
-                "ready_status": p.ready
-            })
+            players.append(p)
 
         return True, players
 
@@ -209,7 +205,7 @@ class GameService:
         if row["status"] != "Paused":
             return False, "Game is not paused"
 
-        history, error = self.db.get_player_history(player.user_id)
+        history, error = self.db.get_player_history(player.user_id) #type: ignore
         if not history:
             return False, error
 
@@ -238,7 +234,7 @@ class GameService:
         if not success:
             return False, player
 
-        history, error = self.db.get_player_history(player.user_id)
+        history, error = self.db.get_player_history(player.user_id) #type: ignore
         if not history:
             return False, error
 
@@ -360,14 +356,14 @@ class GameService:
         current_player = game.return_current_player().user_id
         discard_top = game.discard_pile.peek().to_dict()
         deck_size = len(game.deck.cards)
-        has_drawn = player.has_drawn
-        has_melded = player.has_melded
+        has_drawn = player.has_drawn #type: ignore
+        has_melded = player.has_melded #type: ignore
         required_meld_score = game.current_required_meld_score
         winner = game.winner.user_id if game.winner else None
 
         # Convert the player's hand into a list of dictionaries for easy use by the UI.
         hand = []
-        for card in player.hand.cards:
+        for card in player.hand.cards: #type: ignore
             hand.append(card.to_dict())
 
         # Convert all melds on the table into nested lists of card dictionaries.
@@ -390,7 +386,7 @@ class GameService:
 
         # Store the cards currently selected by the player.
         selected_cards = []
-        for card in player.get_stored_cards():
+        for card in player.get_stored_cards(): #type: ignore
             selected_cards.append(card.to_dict())
 
         state = {

@@ -1,4 +1,4 @@
-class Discard_pile:
+class DiscardPile:
     """
     Represents the discard pile used during gameplay.
 

@@ -168,3 +168,12 @@ class Player:
         self.has_melded = False
         self.has_drawn = False
         self.drawn_from_discard = False
+    
+    def add_card(self, card):
+        """
+        Abstraction of the add_card method from the hand class.
+
+        Args:
+            card: card object to add to the player's hand.
+        """
+        self.hand.add_card(card)

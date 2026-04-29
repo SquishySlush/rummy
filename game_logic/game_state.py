@@ -1,9 +1,10 @@
 from game_logic.card import Card
 from game_logic.deck import Deck
 from game_logic.ruleset import Ruleset
-from game_logic.discard_pile import Discard_pile
+from game_logic.discard_pile import DiscardPile
 from game_logic.validator import Validator
 from game_logic.utils import Moves, quicksort
+from game_logic.player import Player
 
 from enum import Enum
 
@@ -48,8 +49,8 @@ class GameState:
         self.players = [player]
 
         # Core game components. These are created when the game starts.
-        self.deck = None
-        self.discard_pile = None
+        self.deck: Deck
+        self.discard_pile: DiscardPile
         self.table_melds = []
         self.winner = None
 
@@ -141,7 +142,7 @@ class GameState:
         self.deck.shuffle()
 
         # Create an empty discard pile.
-        self.discard_pile = Discard_pile()
+        self.discard_pile = DiscardPile()
 
         # Deal the starting hand to each player.
         for player in self.players:
@@ -149,7 +150,7 @@ class GameState:
                 player.hand.add_card(self.deck.draw())
 
         # Place the first card from the deck into the discard pile.
-        self.discard_pile.add_card(self.deck.draw())
+        self.discard_pile.push(self.deck.draw())
 
         return True, "Game Started"
 
@@ -185,8 +186,10 @@ class GameState:
         Returns:
             tuple[bool, str | None]: Success status and optional error message.
         """
+        # if self.deck.empty_check():
+        #     self._remake_deck()
+        
         valid, error = Validator.validate_draw(
-            self.deck.peek(),
             self.deck,
             player.has_drawn
         )
@@ -288,7 +291,6 @@ class GameState:
         valid, error = Validator.validate_discard(
             card,
             player.hand.cards,
-            self.discard_pile,
             player.has_drawn,
             player.drawn_from_discard,
             self.ruleset
@@ -296,7 +298,7 @@ class GameState:
 
         if valid:
             player.hand.remove_card(card)
-            self.discard_pile.add_card(card)
+            self.discard_pile.push(card)
             self.next_turn()
             return True, None
         else:
@@ -453,6 +455,20 @@ class GameState:
         """
         player.deselect_card(card)
 
+    def _remake_deck(self):
+        if not self.deck.empty_check():
+            return True, None
+        
+        if self.discard_pile.is_empty() or len(self.discard_pile.cards) <= 1:
+            return False, "Cannot remake deck due to insufficient cards in the discard pile."
+        
+        cards_to_remake = self.discard_pile.split_discard_pile()
+
+        self.deck.add_cards(cards_to_remake)
+        self.deck.shuffle()
+
+        return True, None
+
     def _get_card_from_dict(self, card_dict):
         """
         Convert a dictionary representation of a card back into a Card object.
@@ -482,7 +498,9 @@ class GameState:
             tuple[bool, str | None]: Success status and optional error message.
         """
         move_type = Moves[move["move_type"]]
-        player = self.get_player_by_id(move["user_id"])
+        player = self.get_player_by_id(move.get("user_id"))
+        if player is None:
+            return False, "Player not found"
 
         if move_type == Moves.Draw_Deck:
             return self.draw_from_deck(player)
@@ -491,7 +509,7 @@ class GameState:
             return self.draw_from_discard_pile(player)
 
         elif move_type == Moves.Discard:
-            card = self._get_card_from_dcit(move["card"])
+            card = self._get_card_from_dict(move["card"])
             valid, error = self.discard(player, card)
             if not valid:
                 return False, error
@@ -505,13 +523,9 @@ class GameState:
             return self.play_stored_melds(player)
 
         elif move_type == Moves.Lay_Off:
-            card = self._get_card_from_dcit(move["card"])
+            card = self._get_card_from_dict(move["card"])
             meld = self.table_melds[move["meld_index"]]
             return self.lay_off(player, card, meld)
-
-        elif move_type == Moves.Deck_Shuffle:
-            self.deck.shuffle()
-            return True, None
 
         elif move_type == Moves.Store_Card:
             card = self._get_card_from_dict(move["card"])
@@ -520,6 +534,7 @@ class GameState:
 
         elif move_type == Moves.Deselect_all:
             self.deselect_all(player)
+            return True, None
 
         elif move_type == Moves.Sort_Rank:
             player.sort_rank()
