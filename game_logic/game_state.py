@@ -186,8 +186,8 @@ class GameState:
         Returns:
             tuple[bool, str | None]: Success status and optional error message.
         """
-        # if self.deck.empty_check():
-        #     self._remake_deck()
+        if self.deck.empty_check():
+            self._remake_deck()
         
         valid, error = Validator.validate_draw(
             self.deck,

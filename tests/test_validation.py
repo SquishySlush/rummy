@@ -170,7 +170,11 @@ def test_validation_under_100ms():
     Validator.validate_meld(cards, ruleset)
     end = time.perf_counter()
 
-    assert (end - start) < 0.1, "Validation takes longet than 100ms"
+    t= end-start
+
+    print(t)
+
+    assert t < 0.1, "Validation takes longet than 100ms"
 
 
 #Lay Off Validation Tests
@@ -282,6 +286,8 @@ def test_draw_empty_deck():
 
     valid, error = Validator.validate_draw(deck, p1.has_drawn)
 
+    print(f"Result: {valid}, Message: {error}")
+
     assert valid is False, "Expected invalid draw due to deck being empty"
 
 def test_draw_from_disc():
@@ -310,8 +316,9 @@ def test_draw_from_disc_not_melded():
     p1.has_melded = False
 
     discard_pile = DiscardPile()
-    discard_pile.push(Card("7", Suit.Clubs, ruleset))
-    valid, error = Validator.validate_draw_discard(discard_pile.peek, discard_pile, p1.has_drawn, p1.has_melded, ruleset)
+    c1 = Card("7", Suit.Clubs, ruleset)
+    discard_pile.push(c1)
+    valid, error = Validator.validate_draw_discard(discard_pile.peek(), discard_pile, p1.has_drawn, p1.has_melded, ruleset)
 
     print(f"Result: {valid}, Message: {error}")
 
@@ -325,6 +332,8 @@ def test_draw_from_empty_disc():
 
     discard_pile = DiscardPile()
     valid, error = Validator.validate_draw_discard(discard_pile.peek, discard_pile, p1.has_drawn, p1.has_melded, ruleset)
+
+    print(f"Result: {valid}, Message: {error}")
 
     assert valid is False, "Expected invalid draw due to player not having melded"
 
@@ -362,7 +371,7 @@ def test_discard_same_card():
 
     c1 = Card("7", Suit.Clubs, ruleset)
     p1.add_card(c1)
-    p1.drawn_from_discard = c1
+    p1.drawn_from_discard = c1 #type: ignore
     valid, error = Validator.validate_discard(c1, p1.hand.cards, p1.has_drawn, p1.drawn_from_discard, ruleset)
 
     print(f"Result: {valid}, Message: {error}")
