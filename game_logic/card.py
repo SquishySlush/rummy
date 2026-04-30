@@ -25,7 +25,7 @@ class Card:
 
             raise ValueError(f"{rank} is not a valid rank")
         
-        if rank not in ruleset.wilds:
+        if rank not in wild_ranks:
         #Non-wild cards must have a valid suit
 
             if suit not in Suit:

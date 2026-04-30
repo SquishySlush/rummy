@@ -273,7 +273,7 @@ class Validator:
         Returns:
             tuple: Validation result.
         """
-        if deck.is_empty():
+        if deck.empty_check():
             return False, "Deck is Empty"
         if has_drawn:
             return False, "Player has Drawn"
