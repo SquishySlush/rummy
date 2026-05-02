@@ -270,3 +270,21 @@ class LinkRepository:
         db.commit()
 
         return True, None
+
+    @staticmethod
+    def get_pending_requests_for_user(db, user_id):
+        result = db.execute(
+            """
+            SELECT * FROM FriendsList
+            WHERE (user_id = %s OR friend_id = %s)
+            AND status = 'Pending'
+            """,
+            (user_id, user_id)
+        )
+
+        rows = result.fetchall()
+
+        if not rows:
+            return False, "No Pending Requests"
+
+        return True, rows

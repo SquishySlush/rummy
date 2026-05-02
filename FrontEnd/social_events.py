@@ -31,7 +31,7 @@ def social_events(socketio, game_service):
 
     @socketio.on("reject_request")
     @socket_registered_only
-    def on_rejest_request(data):
+    def on_reject_request(data):
         success, error = game_service.reject_friend_request(session["user_id"], data["friend_id"])
         if not success:
             emit("error", {"error": error})

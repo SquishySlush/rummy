@@ -40,6 +40,11 @@ class DatabaseService:
 
         if user is None:
             return None, error
+    
+        is_guest, error = UserRepository.get_user_guest_status(self.db, user["user_id"])
+
+        if is_guest:
+            return None, "Guest Account Cannot Login"
 
         stored_hash = user["password"]
         salt = user["salt"]
@@ -301,7 +306,7 @@ class DatabaseService:
         """
         Retrieve the game history for a user.
         """
-        success, rows = LinkRepository.get_game_history_by_user(self.db, user_id)
+        success, rows = LinkRepository.get_game_history_by_player(self.db, user_id)
         if not success:
             return False, rows
 

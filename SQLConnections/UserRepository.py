@@ -15,7 +15,7 @@ class UserRepository:
     """
 
     @staticmethod
-    def create_user(db, username, password, email, guest=False):
+    def create_user(db, username, password, email):
         """
         Create a new user account.
 
@@ -26,9 +26,8 @@ class UserRepository:
         Args:
             db: The database connection object.
             username (str): The username for the new account.
-            password (str): The user's plain text password.
-            email (str): The user's email address.
-            guest (bool): Whether the account is a guest account.
+            password (str): The user's plain text hashed password, if None then guest user.
+            email (str): The user's email address, if None then guest user.
 
         Returns:
             tuple: (True, user) if successful, otherwise (False, error_message).
@@ -36,11 +35,15 @@ class UserRepository:
         if UserRepository._username_exists(db, username):
             return False, "Username Exists"
 
-        salt, hashed_password = hash_password(password)
+        if password is None:
+            salt = None
+            hashed_password = None
+        else:
+            salt, hashed_password = hash_password(password)
 
         db.execute(
-            "INSERT INTO Users(username, password, email, salt, guest) VALUES (%s, %s, %s, %s, %s)",
-            (username, hashed_password, email, salt, guest)
+            "INSERT INTO Users(username, password, email, salt) VALUES (%s, %s, %s, %s)",
+            (username, hashed_password, email, salt)
         )
         db.commit()
 
@@ -249,10 +252,10 @@ class UserRepository:
             user_id (int): The ID of the user.
 
         Returns:
-            tuple: (True, row) if found, otherwise (False, error_message).
+            tuple: (True, None) if user is a guest, False, None if not a guest, otherwise (False, error_message).
         """
         result = db.execute(
-            "SELECT guest FROM Users WHERE user_id = %s",
+            "SELECT email FROM Users WHERE user_id = %s",
             (user_id,)
         )
 
@@ -260,7 +263,10 @@ class UserRepository:
 
         if row is None:
             return False, "User Not Found"
-        return True, row
+        
+        if row["email"] is None:
+            return True, None
+        return False, None
 
     @staticmethod
     def get_username_by_user_id(db, user_id):

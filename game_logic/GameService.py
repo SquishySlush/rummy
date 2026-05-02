@@ -431,7 +431,7 @@ class GameService:
             tuple: (True, user_data) if successful, otherwise (False, error_message).
         """
         username = f"Guest_{uuid.uuid4().hex[:8]}"
-        success, user = self.db.sign_up(username, None, None, True)
+        success, user = self.db.sign_up(username, None, None)
         if not success:
             return False, "Could Not Create Guest"
 
